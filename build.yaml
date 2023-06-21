@@ -5,4 +5,4 @@ targets:
       source_gen:combining_builder:
         options:
           build_extensions:
-            '^lib/realm/model/{{}}.dart': 'lib/realm/model/generated/{{}}.g.dart'
+            '^lib/resources/realm/model/{{}}.dart': 'lib/resources/realm/model/generated/{{}}.g.dart'
