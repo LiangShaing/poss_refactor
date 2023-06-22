@@ -37,7 +37,9 @@ dependencies:
   connectivity_plus: 3.0.4
   intl: 0.17.0
   collection: 1.17.0
-
+  flutter_localizations:
+    sdk: flutter
+  shared_preferences: ^2.1.2
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
@@ -65,7 +67,6 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -96,3 +97,6 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+  assets:
+    - lib/i18n/support_locale.json
+    - assets/i18n/

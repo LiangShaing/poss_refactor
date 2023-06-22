@@ -3,6 +3,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/realm_authorized_bloc.dart';
 import 'package:mobile_poss_gp01/events/realm_authorized_event.dart';
+import 'package:mobile_poss_gp01/extension/string_extension.dart';
+import 'package:mobile_poss_gp01/i18n/localizations.dart';
 import 'package:mobile_poss_gp01/states/realm_authorized_state.dart';
 
 class LoginPage extends StatelessWidget {
@@ -25,7 +27,7 @@ class LoginPage extends StatelessWidget {
         break;
       case RealmStatePermissionUnauthenticated:
         widget = ElevatedButton(
-          child: const Text("Login"),
+          child:  Text("base.login.button.loginBtn".tr),
           onPressed: () => context.read<RealmAuthorizedBloc>().add(RealmLoginStarted()),
         );
         break;
