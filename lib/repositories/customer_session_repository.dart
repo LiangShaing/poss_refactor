@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:mobile_poss_gp01/repositories/repository.dart';
-import 'package:mobile_poss_gp01/resources/realm/model/customer_session.dart';
+import 'package:mobile_poss_gp01/database_objects/realm/model/customer_session.dart';
 import 'package:realm/realm.dart';
 import 'package:collection/collection.dart';
 

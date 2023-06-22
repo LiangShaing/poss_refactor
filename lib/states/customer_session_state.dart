@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:mobile_poss_gp01/resources/realm/model/customer_session.dart';
+import 'package:mobile_poss_gp01/database_objects/realm/model/customer_session.dart';
 
 abstract class CustomerSessionState<T> extends Equatable {
   const CustomerSessionState();

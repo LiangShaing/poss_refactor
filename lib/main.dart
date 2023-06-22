@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:mobile_poss_gp01/blocs/customer_session_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/realm_authorized_bloc.dart';
 import 'package:mobile_poss_gp01/events/localization_event.dart';
 import 'package:mobile_poss_gp01/i18n/localizations.dart';
 import 'package:mobile_poss_gp01/observers/global_bloc_observer.dart';
-import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
 import 'package:mobile_poss_gp01/repositories/realm_authorized_repository.dart';
-import 'package:mobile_poss_gp01/resources/realm/realm_sync_dao.dart';
-import 'package:mobile_poss_gp01/states/customer_session_state.dart';
+import 'package:mobile_poss_gp01/database_objects/realm/realm_sync_dao.dart';
 import 'package:mobile_poss_gp01/states/locailzation_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/pages/index/index_page.dart';

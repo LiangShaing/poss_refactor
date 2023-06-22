@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:mobile_poss_gp01/blocs/realm_bloc.dart';
 import 'package:mobile_poss_gp01/events/customer_session_event.dart';
 import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
-import 'package:mobile_poss_gp01/resources/realm/model/realm_models.dart';
+import 'package:mobile_poss_gp01/database_objects/realm/model/realm_models.dart';
 import 'package:mobile_poss_gp01/states/customer_session_state.dart';
 import 'package:realm/realm.dart';
 
