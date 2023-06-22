@@ -16,6 +16,7 @@ import 'package:mobile_poss_gp01/states/locailzation_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/screens/index/index_screen.dart';
 import 'package:mobile_poss_gp01/widgets/screens/login/login_screen.dart';
+import 'package:mobile_poss_gp01/widgets/screens/login/realm_login_screen.dart';
 import 'package:realm/realm.dart';
 import 'blocs/localization_bloc.dart';
 import 'events/app_init_event.dart';
@@ -82,6 +83,7 @@ class MyApp extends StatelessWidget {
                   initialRoute: "/",
                   routes: {
                     '/': (context) => const LoginScreen(),
+                    // '/': (context) => const RealmLoginScreen(),
                     "/index": (context) => const IndexScreen(),
                   },
                   // initialRoute: BaseRoute.loginPageRouteName,

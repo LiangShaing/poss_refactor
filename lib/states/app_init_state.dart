@@ -19,3 +19,12 @@ class AppInitLoadFailure extends AppInitState {
   @override
   List<Object> get props => [];
 }
+
+class AppInitDeepLinkCodeLoadSuccess extends AppInitState {
+  final String code;
+
+  const AppInitDeepLinkCodeLoadSuccess({super.deviceId, required this.code});
+
+  @override
+  List<Object> get props => [];
+}

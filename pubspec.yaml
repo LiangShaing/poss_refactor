@@ -45,6 +45,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   device_info_plus: 8.2.2
   android_id: 0.3.2
+  chowsangsang_enterprise_portal:
+    path: ../chowsangsang_enterprise_portal
+  flutter_deep_link:
+    path: ../flutter_deep_link
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +62,9 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   build_runner: 2.3.3
   source_gen: ^1.1.0
+
+dependency_overrides:
+  json_serializable: 6.5.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -102,3 +109,4 @@ flutter:
   assets:
     - lib/i18n/support_locale.json
     - assets/i18n/
+    - assets/images/
