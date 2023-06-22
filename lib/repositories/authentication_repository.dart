@@ -12,4 +12,19 @@ class AuthenticationRepository {
   }
 
 
+  Future<bool> saveOauthToken(String code) {
+    return authenticationDataProvider.saveOauthToken(code);
+  }
+
+  Future<String> getUserId() {
+    return authenticationDataProvider.getUserId();
+  }
+
+  Future<void> cleanOauth() {
+    return authenticationDataProvider.cleanOauth();
+  }
+
+  Future<bool> execRefreshToken(){
+    return authenticationDataProvider.execRefreshToken();
+  }
 }

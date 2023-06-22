@@ -16,4 +16,21 @@ class AuthenticationDataProvider {
   Future<String> getOauthURL() {
     return oauthService.getOauthURL();
   }
+
+  Future<bool> saveOauthToken(String code) {
+    return oauthService.getOauthToken(code);
+  }
+
+  Future<String> getUserId() {
+    return oauthService.getUserId();
+  }
+
+  Future<void> cleanOauth() {
+   return oauthService.cleanOauth();
+  }
+
+  Future<bool> execRefreshToken(){
+    return oauthService.execRefreshToken();
+
+  }
 }

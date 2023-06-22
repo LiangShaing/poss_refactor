@@ -35,7 +35,10 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
       Platform.isAndroid ? await _openBrowser() : await _openSafariService();
     } else {
       Logger.debug(message: "refreshToken exist");
-      // await oauthService.execRefreshToken();
+
+      bool bln = await authenticationRepository.execRefreshToken();
+      emit(state.copyWith(status: BlocStatus.success, refreshTokenExisted: true));
+
       // Logger.debug(message: "execRefreshToken successful");
       // userId = await oauthService.getUserId();
 
@@ -118,7 +121,31 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
     // }
   }
 
-  Future<void> _login(AuthenticationEvent event, Emitter<AuthenticationState> emit) async {}
+  Future<void> _login(AuthenticationLoginRequested event, Emitter<AuthenticationState> emit) async {
+    bool value = await authenticationRepository.saveOauthToken(event.code);
+
+    if (value) {
+      Logger.debug(message: "get oauth token success");
+      // NewRelicPlugin.loginRecord(className: "LoginPage", message: "get oauth token success");
+      emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: true));
+      String userId = await authenticationRepository.getUserId();
+      Logger.debug(message: "_oauthTokenEndpoint  UserId: $userId");
+      // NewRelicPlugin.userId(userId: userId);
+
+      emit(state.copyWith(status: BlocStatus.success, refreshTokenExisted: true, accessTokenExisted: true));
+    } else {
+      emit(state.copyWith(status: BlocStatus.failure, refreshTokenExisted: false, accessTokenExisted: false));
+
+      // _loginInfoModel.logout();
+      Logger.debug(message: "get oauth token unsuccessful");
+      // NewRelicPlugin.loginRecord(className: "LoginPage", message: "get oauth token unsuccessful");
+
+      // show error messages
+      // _showMyDialog(Translate.of(context).getLan("base.login.msg.oauthLoginUnsuccessful"));
+      // 清掉所有storage
+      await authenticationRepository.cleanOauth();
+    }
+  }
 
   ///取得device id
   Future<void> _logout(AuthenticationEvent event, Emitter<AuthenticationState> emit) async {}
@@ -149,5 +176,3 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
     }
   }
 }
-
-

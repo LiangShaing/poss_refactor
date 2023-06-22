@@ -1,2 +1,13 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
 #include "Generated.xcconfig"
+
+PRODUCT_BUNDLE_IDENTIFIER=com.chowsangsang.storefront.poss.uat
+IS_BUNDEL_NAME=Mobile-Poss-UAT
+IS_APP_NAME=門店POSS(TEST)
+IPHONEOS_DEPLOYMENT_TARGET=11.0
+IS_URL_SCHEME=chowsangsang
+IS_URL_IDENTIFIER=uat.mobile.poss.chowsangsang.com
+IS_NEWRELIC_TOKEN=AA28b7d31b84158693555894b9a32f542474b7fe10-NRMA
+DEVELOPMENT_TEAM=CDDQX452N6
+IS_GET_MANIFAST_URL=businesssalestest.chowsangsang.com/resource/app/possmobileapp/manifest.plist
+IS_APP_DOWNLOAD_URL=businesssalestest.chowsangsang.com/resource/app/possmobileapp/download.html

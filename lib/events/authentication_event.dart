@@ -6,6 +6,10 @@ class AuthenticationInitialed extends AuthenticationEvent {
   AuthenticationInitialed({this.isAutoLogin = false}) : super();
 }
 
-class AuthenticationLoginRequested extends AuthenticationEvent {}
+class AuthenticationLoginRequested extends AuthenticationEvent {
+  final String code;
+
+  AuthenticationLoginRequested({required this.code}) : super();
+}
 
 class AuthenticationLogoutRequested extends AuthenticationEvent {}
