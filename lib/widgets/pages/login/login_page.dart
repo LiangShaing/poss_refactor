@@ -44,6 +44,9 @@ class LoginPage extends StatelessWidget {
     }
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Flutter Demo Home Page'),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

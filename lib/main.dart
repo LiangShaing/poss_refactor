@@ -7,6 +7,7 @@ import 'package:mobile_poss_gp01/i18n/localizations.dart';
 import 'package:mobile_poss_gp01/observers/global_bloc_observer.dart';
 import 'package:mobile_poss_gp01/repositories/realm_authorized_repository.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/realm_sync_dao.dart';
+import 'package:mobile_poss_gp01/resources/theme.dart';
 import 'package:mobile_poss_gp01/states/locailzation_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/pages/index/index_page.dart';
@@ -42,9 +43,7 @@ class MyApp extends StatelessWidget {
       child: BlocBuilder<LocalizationBloc, LocalizationState>(builder: (context, state) {
         return MaterialApp(
           navigatorKey: navigationKey,
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
+          theme: appThemeData(context),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
@@ -58,9 +57,9 @@ class MyApp extends StatelessWidget {
                 return null;
               }
               Future(() {
-                Locale _locale = Translate.getLocaleFromLocaleString(locale.toLanguageTag());
-                Logger.debug(message: "localeResolutionCallback _locale : ${_locale.toString()}");
-                context.read<LocalizationBloc>().add(LocalizationChanged(locale: _locale));
+                Locale lang = Translate.getLocaleFromLocaleString(locale.toLanguageTag());
+                Logger.debug(message: "localeResolutionCallback _locale : ${lang.toString()}");
+                context.read<LocalizationBloc>().add(LocalizationChanged(locale: lang));
               });
             }
             return null;
