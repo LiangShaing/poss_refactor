@@ -6,7 +6,7 @@ import 'package:mobile_poss_gp01/states/realm_authorized_state.dart';
 import 'package:realm/realm.dart';
 import 'dart:developer';
 
-class RealmAuthorizedBloc extends RealmBloc<RealmAuthorizedEvent, RealmAuthorizedState> {
+class RealmAuthorizedBloc extends AbstractBloc<RealmAuthorizedEvent, RealmAuthorizedState> {
   final RealmAuthorizedRepository realmAuthorizedRepository;
 
   RealmAuthorizedBloc({required this.realmAuthorizedRepository})

@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_poss_gp01/blocs/realm_bloc.dart';
 import 'package:mobile_poss_gp01/events/customer_session_event.dart';
@@ -9,7 +9,7 @@ import 'package:mobile_poss_gp01/database_objects/realm/model/realm_models.dart'
 import 'package:mobile_poss_gp01/states/customer_session_state.dart';
 import 'package:realm/realm.dart';
 
-class CustomerSessionBloc extends RealmBloc<CustomerSessionEvent, CustomerSessionState> {
+class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSessionState> {
   final CustomerSessionRepository customerSessionRepository;
 
   CustomerSessionBloc({required this.customerSessionRepository}) : super(CustomerSessionInitial()){
