@@ -6,8 +6,8 @@ import 'package:mobile_poss_gp01/events/customer_session_event.dart';
 import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
 import 'package:mobile_poss_gp01/states/customer_session_state.dart';
 
-class IndexPage extends StatelessWidget {
-  const IndexPage({super.key});
+class IndexScreen extends StatelessWidget {
+  const IndexScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

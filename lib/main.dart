@@ -10,8 +10,8 @@ import 'package:mobile_poss_gp01/database_objects/realm/realm_sync_dao.dart';
 import 'package:mobile_poss_gp01/resources/theme.dart';
 import 'package:mobile_poss_gp01/states/locailzation_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
-import 'package:mobile_poss_gp01/widgets/pages/index/index_page.dart';
-import 'package:mobile_poss_gp01/widgets/pages/login/login_page.dart';
+import 'package:mobile_poss_gp01/widgets/screens/index/index_screen.dart';
+import 'package:mobile_poss_gp01/widgets/screens/login/login_screen.dart';
 import 'package:realm/realm.dart';
 import 'blocs/localization_bloc.dart';
 
@@ -67,9 +67,13 @@ class MyApp extends StatelessWidget {
           locale: state.locale,
           initialRoute: "/",
           routes: {
-            '/': (context) => const LoginPage(),
-            "/index": (context) => const IndexPage(),
+            '/': (context) => const LoginScreen(),
+            "/index": (context) => const IndexScreen(),
           },
+          // initialRoute: BaseRoute.loginPageRouteName,
+          // onGenerateRoute: (settings) {
+          //   return GenerateRoute.route(routeSettings: settings);
+          // },
         );
       }),
     );

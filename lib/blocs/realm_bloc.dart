@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-abstract class RealmBloc<T, U> extends Bloc<T, U>  {
-  RealmBloc(super.initialState);
+abstract class AbstractBloc<T, U> extends Bloc<T, U>  {
+  AbstractBloc(super.initialState);
 }

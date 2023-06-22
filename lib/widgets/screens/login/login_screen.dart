@@ -4,11 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/realm_authorized_bloc.dart';
 import 'package:mobile_poss_gp01/events/realm_authorized_event.dart';
 import 'package:mobile_poss_gp01/extension/string_extension.dart';
-import 'package:mobile_poss_gp01/i18n/localizations.dart';
+import 'package:mobile_poss_gp01/routes/custom_page_route.dart';
 import 'package:mobile_poss_gp01/states/realm_authorized_state.dart';
+import 'package:mobile_poss_gp01/widgets/screens/index/index_screen.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,7 @@ class LoginPage extends StatelessWidget {
         break;
       case RealmStatePermissionUnauthenticated:
         widget = ElevatedButton(
-          child:  Text("base.login.button.loginBtn".tr),
+          child: Text("base.login.button.loginBtn".tr),
           onPressed: () => context.read<RealmAuthorizedBloc>().add(RealmLoginStarted()),
         );
         break;
@@ -36,7 +37,10 @@ class LoginPage extends StatelessWidget {
         break;
       case RealmStateSubscriptionsUpdated:
         SchedulerBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(context).pushNamed("/index");
+          // Navigator.of(context).pushNamed("/index");
+          Navigator.push(context, CustomPageRoute(builder: (context) {
+            return IndexScreen();
+          }));
         });
         break;
       default:
