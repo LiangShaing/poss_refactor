@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mobile_poss_gp01/blocs/app_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/authentication_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/realm_mgmt_bloc.dart';
+import 'package:mobile_poss_gp01/enum/bloc_status.dart';
 import 'package:mobile_poss_gp01/events/localization_event.dart';
 import 'package:mobile_poss_gp01/i18n/localizations.dart';
 import 'package:mobile_poss_gp01/observers/global_bloc_observer.dart';
@@ -19,10 +20,9 @@ import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/components/app_life_cycle_manager_stateful_widget.dart';
 import 'package:mobile_poss_gp01/widgets/screens/index/index_screen.dart';
 import 'package:mobile_poss_gp01/widgets/screens/login/login_screen.dart';
-import 'package:mobile_poss_gp01/widgets/screens/login/realm_login_screen.dart';
 import 'package:realm/realm.dart';
 import 'blocs/localization_bloc.dart';
-import 'events/app_init_event.dart';
+import 'events/app_mgmt_event.dart';
 
 GlobalKey<NavigatorState> navigationKey = GlobalKey();
 
@@ -55,8 +55,8 @@ class MyApp extends StatelessWidget {
         ],
         child: BlocBuilder<AppMgmtBloc, AppMgmtState>(builder: (context, state) {
           Widget widget;
-          switch (state.runtimeType) {
-            case AppMgmtLoadFailure:
+          switch (state.status) {
+            case BlocStatus.failure:
               Logger.error(message: "AppInitLoadFailure");
               exit(1);
             default:

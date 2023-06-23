@@ -51,12 +51,12 @@ class _MyScaffoldState extends State<MyScaffoldStatefulWidget> {
     return Scaffold(
       appBar: widget.isShowAppBar
           ? MyAppBarStatelessWidget(
-        isShowDrawer: widget.hasDrawer,
-        isShowActions: widget.isShowActions,
-        isShowBack: widget.isShowBack,
-        openDrawer: widget.hasDrawer ? widget.openDrawer : null,
-        backFunc: widget.backFunc,
-      )
+              isShowDrawer: widget.hasDrawer,
+              isShowActions: widget.isShowActions,
+              isShowBack: widget.isShowBack,
+              openDrawer: widget.hasDrawer ? widget.openDrawer : null,
+              backFunc: widget.backFunc,
+            )
           : null,
       // resizeToAvoidBottomInset: false,
       // bottomNavigationBar: widget.isShowBottomAppBar
@@ -115,19 +115,19 @@ class _MyScaffoldState extends State<MyScaffoldStatefulWidget> {
                 maxWidth: double.infinity,
                 child: IgnorePointer(
                     child: RotationTransition(
-                      turns: const AlwaysStoppedAnimation(-15 / 360),
-                      child: Column(
-                        children: [
-                          ...List.filled((MediaQuery.of(context).size.height / 50).round(), 0).map(
-                                (_) => Row(
-                              children: [
-                                ...List.filled((MediaQuery.of(context).size.width / 120).round(), 0).map((_) => watermark),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    )),
+                  turns: const AlwaysStoppedAnimation(-15 / 360),
+                  child: Column(
+                    children: [
+                      ...List.filled((MediaQuery.of(context).size.height / 50).round(), 0).map(
+                        (_) => Row(
+                          children: [
+                            ...List.filled((MediaQuery.of(context).size.width / 120).round(), 0).map((_) => watermark),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                )),
               ),
             ),
         ],

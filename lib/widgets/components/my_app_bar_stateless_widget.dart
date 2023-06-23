@@ -1,7 +1,11 @@
 import 'package:chowsangsang_enterprise_portal/service_factory.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_poss_gp01/blocs/app_mgmt_bloc.dart';
+import 'package:mobile_poss_gp01/events/app_mgmt_event.dart';
 import 'package:mobile_poss_gp01/resources/size_style.dart';
+import 'package:mobile_poss_gp01/states/app_mgmt_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:realm/realm.dart';
@@ -113,7 +117,6 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
 
   @override
   Widget build(BuildContext context) {
-
     const String currentVersion = String.fromEnvironment("VERSION", defaultValue: "");
     return AppBar(
       elevation: 0,
@@ -126,10 +129,19 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // _appProvider.isOpenDrawer
-                //     ? IconButton(
-                //         onPressed: backFunc, icon: const Icon(Icons.menu_open_outlined, color: Colors.black, size: 32))
-                //     : IconButton(onPressed: openDrawer, icon: const Icon(Icons.menu, color: Colors.black, size: 32)),
+                BlocBuilder<AppMgmtBloc, AppMgmtState>(builder: (BuildContext context, AppMgmtState state) {
+                  Widget widget = Container();
+                  if (state.drawer) {
+                    widget = IconButton(
+                        onPressed: () => BlocProvider.of<AppMgmtBloc>(context).add(AppMgmtDrawerClosed()),
+                        icon: const Icon(Icons.menu_open_outlined, color: Colors.black, size: 32));
+                  } else if (!state.drawer) {
+                    widget = IconButton(
+                        onPressed: () => BlocProvider.of<AppMgmtBloc>(context).add(AppMgmtDrawerShowed()),
+                        icon: const Icon(Icons.menu, color: Colors.black, size: 32));
+                  }
+                  return widget;
+                }),
                 // StreamBuilder<RealmResultsChanges<CustomerSession>>(
                 //   stream: IndexPageState.customerService.getCurrentCustomerSession()?.changes,
                 //   builder: (context, snapshot) {

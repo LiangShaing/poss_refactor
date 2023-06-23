@@ -7,3 +7,11 @@ class AppMgmtCASCodeReturned extends AppMgmtEvent {
 
   AppMgmtCASCodeReturned({required this.code}) : super();
 }
+
+class AppMgmtDrawerShowed extends AppMgmtEvent {
+  AppMgmtDrawerShowed() : super();
+}
+
+class AppMgmtDrawerClosed extends AppMgmtEvent {
+  AppMgmtDrawerClosed() : super();
+}
