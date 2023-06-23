@@ -89,29 +89,31 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
     Logger.debug(message: "_ldapLogin");
     try {
       if (state.ldapPassword.isEmpty) {
+        Logger.debug(message: "_ldapLogin ldapPassword isEmpty");
         emit(state.copyWith(
             status: BlocStatus.failure,
             refreshTokenExisted: true,
             accessTokenExisted: false,
             error: "base.login.msg.textFieldRequired".tr,
             ldapVerified: true));
-      }
-      Logger.debug(message: "_ldapLogin [${state.ldapPassword}]");
-      emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: false));
-      //驗證ldap
-      String userId = await authenticationRepository.getUserId();
-      bool value = await authenticationRepository.userVerified(userId, state.ldapPassword);
-      if (value) {
-        Logger.debug(message: "verify LDAP successful");
-        emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: true));
       } else {
-        emit(state.copyWith(
-            status: BlocStatus.failure,
-            refreshTokenExisted: true,
-            accessTokenExisted: false,
-            error: "base.login.msg.pwdUnsuccessful".tr,
-            ldapVerified: true,
-            ldapPassword: ''));
+        Logger.debug(message: "_ldapLogin [${state.ldapPassword}]");
+        emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: false));
+        //驗證ldap
+        String userId = await authenticationRepository.getUserId();
+        bool value = await authenticationRepository.userVerified(userId, state.ldapPassword);
+        if (value) {
+          Logger.debug(message: "verify LDAP successful");
+          emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: true));
+        } else {
+          emit(state.copyWith(
+              status: BlocStatus.failure,
+              refreshTokenExisted: true,
+              accessTokenExisted: false,
+              error: "base.login.msg.pwdUnsuccessful".tr,
+              ldapVerified: true,
+              ldapPassword: ''));
+        }
       }
     } catch (error) {
       emit(state.copyWith(
@@ -121,6 +123,10 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
           error: error.toString(),
           ldapVerified: true,
           ldapPassword: ''));
+    } finally {
+      if (state.status == BlocStatus.failure) {
+        emit(state.copyWith(status: BlocStatus.initial, error: ''));
+      }
     }
   }
 
