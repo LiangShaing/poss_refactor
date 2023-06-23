@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile_poss_gp01/blocs/app_init_bloc.dart';
+import 'package:mobile_poss_gp01/blocs/app_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/authentication_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/realm_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/enum/bloc_status.dart';
@@ -12,7 +12,7 @@ import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/resources/color_style.dart';
 import 'package:mobile_poss_gp01/resources/size_style.dart';
 import 'package:mobile_poss_gp01/routes/custom_page_route.dart';
-import 'package:mobile_poss_gp01/states/app_init_state.dart';
+import 'package:mobile_poss_gp01/states/app_mgmt_state.dart';
 import 'package:mobile_poss_gp01/states/authentication_state.dart';
 import 'package:mobile_poss_gp01/states/realm_mgmt_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
@@ -34,9 +34,9 @@ class LoginScreen extends StatelessWidget {
             },
             child: MultiBlocListener(
               listeners: [
-                BlocListener<AppInitBloc, AppInitState>(listener: (context, state) {
-                  if (state.runtimeType == AppInitDeepLinkCodeLoadSuccess) {
-                    AppInitDeepLinkCodeLoadSuccess e = state as AppInitDeepLinkCodeLoadSuccess;
+                BlocListener<AppMgmtBloc, AppMgmtState>(listener: (context, state) {
+                  if (state.runtimeType == AppMgmtDeepLinkCodeLoadSuccess) {
+                    AppMgmtDeepLinkCodeLoadSuccess e = state as AppMgmtDeepLinkCodeLoadSuccess;
                     Logger.debug(message: "AppInitBloc AppInitDeepLinkCodeLoadSuccess [${e.code}]");
                     BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginRequested(code: e.code));
                   }

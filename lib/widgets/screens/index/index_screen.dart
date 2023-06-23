@@ -5,6 +5,7 @@ import 'package:mobile_poss_gp01/blocs/customer_session_bloc.dart';
 import 'package:mobile_poss_gp01/events/customer_session_event.dart';
 import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
 import 'package:mobile_poss_gp01/states/customer_session_state.dart';
+import 'package:mobile_poss_gp01/widgets/components/my_scaffold_stateful_widget.dart';
 
 class IndexScreen extends StatelessWidget {
   const IndexScreen({super.key});
@@ -41,23 +42,21 @@ class IndexScreen extends StatelessWidget {
         widget = Container();
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter Demo Home Page'),
-      ),
+    return MyScaffoldStatefulWidget(
+
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[widget],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.read<CustomerSessionBloc>().add(CustomerSessionStarted());
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     context.read<CustomerSessionBloc>().add(CustomerSessionStarted());
+      //   },
+      //   tooltip: 'Increment',
+      //   child: const Icon(Icons.add),
+      // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

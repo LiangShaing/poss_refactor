@@ -1,9 +1,9 @@
-abstract class AppInitEvent {}
+abstract class AppMgmtEvent {}
 
-class AppInitStarted extends AppInitEvent {}
+class AppMgmtInitialed extends AppMgmtEvent {}
 
-class AppInitCASCodeReturned extends AppInitEvent {
+class AppMgmtCASCodeReturned extends AppMgmtEvent {
   final String code;
 
-  AppInitCASCodeReturned({required this.code}) : super();
+  AppMgmtCASCodeReturned({required this.code}) : super();
 }

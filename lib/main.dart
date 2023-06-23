@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:mobile_poss_gp01/blocs/app_init_bloc.dart';
+import 'package:mobile_poss_gp01/blocs/app_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/authentication_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/realm_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/events/localization_event.dart';
@@ -13,7 +13,7 @@ import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/repositories/realm_authorized_repository.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/realm_sync_dao.dart';
 import 'package:mobile_poss_gp01/resources/theme.dart';
-import 'package:mobile_poss_gp01/states/app_init_state.dart';
+import 'package:mobile_poss_gp01/states/app_mgmt_state.dart';
 import 'package:mobile_poss_gp01/states/locailzation_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/components/app_life_cycle_manager_stateful_widget.dart';
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
         providers: [
-          BlocProvider<AppInitBloc>(create: (_) => AppInitBloc()..add(AppInitStarted())),
+          BlocProvider<AppMgmtBloc>(create: (_) => AppMgmtBloc()..add(AppMgmtInitialed())),
           BlocProvider<LocalizationBloc>(create: (_) => LocalizationBloc()),
           BlocProvider<RealmMgmtBloc>(
             create: (BuildContext context) => RealmMgmtBloc(realmAuthorizedRepository: RealmAuthorizedRepository()),
@@ -53,10 +53,10 @@ class MyApp extends StatelessWidget {
               create: (BuildContext context) =>
                   AuthenticationBloc(authenticationRepository: AuthenticationRepository()))
         ],
-        child: BlocBuilder<AppInitBloc, AppInitState>(builder: (context, state) {
+        child: BlocBuilder<AppMgmtBloc, AppMgmtState>(builder: (context, state) {
           Widget widget;
           switch (state.runtimeType) {
-            case AppInitLoadFailure:
+            case AppMgmtLoadFailure:
               Logger.error(message: "AppInitLoadFailure");
               exit(1);
             default:
@@ -65,6 +65,7 @@ class MyApp extends StatelessWidget {
                   child: MaterialApp(
                     navigatorKey: navigationKey,
                     theme: appThemeData(context),
+                    debugShowCheckedModeBanner: false,
                     localizationsDelegates: const [
                       GlobalMaterialLocalizations.delegate,
                       GlobalWidgetsLocalizations.delegate,
