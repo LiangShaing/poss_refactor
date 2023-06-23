@@ -25,15 +25,15 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
 
   /// 驗證登入狀態
   Future<void> _init(AuthenticationInitialed event, Emitter<AuthenticationState> emit) async {
-    Logger.debug(message: "AuthenticationBloc _init");
+    Logger.debug(message: "AuthenticationBloc _init isAutoLogin[${event.isAutoLogin}]");
+    if (!event.isAutoLogin) {
+      emit(const AuthenticationState());
+      return;
+    }
     // 檢查refresh token 是否存在
     emit(state.copyWith(status: BlocStatus.loading));
 
     bool refreshTokenExist = await authenticationRepository.checkRefreshTokenExist();
-
-    // if(!state.inLoginScreen){
-    //   add(AuthenticationLogoutRequested());
-    // }
 
     if (!refreshTokenExist) {
       Logger.debug(message: "refreshToken not exist");
@@ -143,13 +143,8 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
   ///取得device id
   Future<void> _logout(AuthenticationEvent event, Emitter<AuthenticationState> emit) async {
     await authenticationRepository.cleanOauth();
-    _logoutOpenBrowser();
-    emit(state.copyWith(
-        status: BlocStatus.initial,
-        refreshTokenExisted: false,
-        accessTokenExisted: false,
-        error: '',
-        ldapVerified: false));
+    await _logoutOpenBrowser();
+    emit(const AuthenticationState());
   }
 
   ///Android打開瀏覽器

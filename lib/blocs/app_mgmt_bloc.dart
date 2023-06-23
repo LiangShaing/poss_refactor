@@ -58,7 +58,10 @@ class AppMgmtBloc extends AbstractBloc<AppMgmtEvent, AppMgmtState> {
     Logger.debug(message: "_initHandleDeepLink");
     // NewRelicPlugin.loginRecord(className: "LoginPage", message: "_initHandleDeepLink");
     FlutterDeepLink.streamDeepLinkResult?.listen((deepLink) {
-      add(AppMgmtCASCodeReturned(code: _urlParser(deepLink)));
+      String code = _urlParser(deepLink);
+      if (code.isNotEmpty) {
+        add(AppMgmtCASCodeReturned(code: code));
+      }
     });
   }
 

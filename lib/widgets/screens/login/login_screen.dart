@@ -20,14 +20,16 @@ import 'package:mobile_poss_gp01/widgets/components/my_linear_progressIndicator.
 import 'package:mobile_poss_gp01/widgets/screens/index/index_screen.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  final bool isAutoLogin;
+
+  const LoginScreen({super.key, this.isAutoLogin = true});
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return BlocProvider(
         create: (BuildContext context) => AuthenticationBloc(authenticationRepository: AuthenticationRepository())
-          ..add(AuthenticationInitialed(isAutoLogin: true)),
+          ..add(AuthenticationInitialed(isAutoLogin: isAutoLogin)),
         child: WillPopScope(
             onWillPop: () async {
               return true;
@@ -68,9 +70,9 @@ class LoginScreen extends StatelessWidget {
                     if (state.runtimeType == RealmMgmtAuthenticatedSuccess) {
                       BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginScreenLeaved());
                       SchedulerBinding.instance.addPostFrameCallback((_) {
-                        Navigator.push(context, CustomPageRoute(builder: (context) {
+                        Navigator.pushAndRemoveUntil(context, CustomPageRoute(builder: (context) {
                           return IndexScreen();
-                        }));
+                        }),(route)=>false);
                       });
                     }
                   },
@@ -172,9 +174,9 @@ class LoginScreen extends StatelessWidget {
               width: 400,
               height: 50,
               child: ElevatedButton.icon(
-                onPressed: () => context
-                    .read<AuthenticationBloc>()
-                    .add(state.ldapVerified ? AuthenticationLDAPLoginRequested() : AuthenticationInitialed()),
+                onPressed: () => context.read<AuthenticationBloc>().add(state.ldapVerified
+                    ? AuthenticationLDAPLoginRequested()
+                    : AuthenticationInitialed(isAutoLogin: true)),
                 icon: const Icon(Icons.login),
                 label: Text(
                   "base.login.button.loginBtn".tr,

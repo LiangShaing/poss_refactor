@@ -1,12 +1,20 @@
 import 'package:chowsangsang_enterprise_portal/service_factory.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/app_mgmt_bloc.dart';
+import 'package:mobile_poss_gp01/blocs/authentication_bloc.dart';
+import 'package:mobile_poss_gp01/blocs/realm_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/events/app_mgmt_event.dart';
+import 'package:mobile_poss_gp01/events/authentication_event.dart';
+import 'package:mobile_poss_gp01/events/realm_mgmt_event.dart';
+import 'package:mobile_poss_gp01/extension/string_extension.dart';
 import 'package:mobile_poss_gp01/resources/size_style.dart';
+import 'package:mobile_poss_gp01/routes/custom_page_route.dart';
 import 'package:mobile_poss_gp01/states/app_mgmt_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
+import 'package:mobile_poss_gp01/widgets/screens/login/login_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:realm/realm.dart';
 
@@ -238,7 +246,43 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
                         constraints: const BoxConstraints.expand(width: 40, height: 40),
                         padding: EdgeInsets.zero,
                         onPressed: () async {
-                          // await _showLogoutDialog(context);
+                          showDialog<bool>(
+                            context: context,
+                            barrierDismissible: false, // user must tap button!
+                            builder: (BuildContext context) => AlertDialog(
+                              title: Column(children: [
+                                const Padding(
+                                  padding: EdgeInsets.only(bottom: 8.0),
+                                  child: Icon(Icons.error_outline_outlined,
+                                      color: Color.fromRGBO(238, 103, 60, 1), size: 24),
+                                ),
+                                Text("base.login.msg.confirmedLogout".tr,
+                                    style: const TextStyle(fontSize: 16, color: Colors.black))
+                              ]),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text("widget.button.back".tr),
+                                  onPressed: () => Navigator.pop(context, false),
+                                ),
+                                TextButton(
+                                  child: Text("widget.button.confirm".tr),
+                                  onPressed: () => Navigator.pop(context, true),
+                                ),
+                              ],
+                            ),
+                          ).then((value) {
+                            if (value == true) {
+                              Logger.debug(message: "logout");
+                              BlocProvider.of<RealmMgmtBloc>(context).add(RealmMgmtLogoutRequested());
+                              BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLogoutRequested());
+
+                              SchedulerBinding.instance.addPostFrameCallback((_) {
+                                Navigator.push(context, CustomPageRoute(builder: (context) {
+                                  return const LoginScreen(isAutoLogin: false);
+                                }));
+                              });
+                            }
+                          });
                         },
                         icon: const Icon(Icons.logout, color: Colors.black),
                       ),
