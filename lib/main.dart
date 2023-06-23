@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mobile_poss_gp01/blocs/app_init_bloc.dart';
-import 'package:mobile_poss_gp01/blocs/realm_authorized_bloc.dart';
+import 'package:mobile_poss_gp01/blocs/realm_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/events/localization_event.dart';
 import 'package:mobile_poss_gp01/i18n/localizations.dart';
 import 'package:mobile_poss_gp01/observers/global_bloc_observer.dart';
@@ -43,9 +43,8 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider<AppInitBloc>(create: (_) => AppInitBloc()..add(AppInitStarted())),
           BlocProvider<LocalizationBloc>(create: (_) => LocalizationBloc()),
-          BlocProvider<RealmAuthorizedBloc>(
-            create: (BuildContext context) =>
-                RealmAuthorizedBloc(realmAuthorizedRepository: RealmAuthorizedRepository()),
+          BlocProvider<RealmMgmtBloc>(
+            create: (BuildContext context) => RealmMgmtBloc(realmAuthorizedRepository: RealmAuthorizedRepository()),
           ),
         ],
         child: BlocBuilder<AppInitBloc, AppInitState>(builder: (context, state) {

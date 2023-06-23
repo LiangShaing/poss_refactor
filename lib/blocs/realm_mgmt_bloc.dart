@@ -1,27 +1,27 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/realm_bloc.dart';
-import 'package:mobile_poss_gp01/events/realm_authorized_event.dart';
+import 'package:mobile_poss_gp01/events/realm_mgmt_event.dart';
 import 'package:mobile_poss_gp01/repositories/realm_authorized_repository.dart';
-import 'package:mobile_poss_gp01/states/realm_authorized_state.dart';
+import 'package:mobile_poss_gp01/states/realm_mgmt_state.dart';
 import 'package:realm/realm.dart';
 import 'dart:developer';
 
-class RealmAuthorizedBloc extends AbstractBloc<RealmAuthorizedEvent, RealmAuthorizedState> {
+class RealmMgmtBloc extends AbstractBloc<RealmMgmtEvent, RealmMgmtState> {
   final RealmAuthorizedRepository realmAuthorizedRepository;
 
-  RealmAuthorizedBloc({required this.realmAuthorizedRepository})
+  RealmMgmtBloc({required this.realmAuthorizedRepository})
       : super(const RealmStatePermissionUnauthenticated(
           isLogin: false,
           isUpdateSubscriptions: false,
           isRealmConnect: false,
         )) {
-    on<RealmLoginStarted>(_realmLoginStarted);
-    on<RealmLogoutStarted>(_realmLogoutStarted);
-    on<RealmConnectStateChange>(_realmConnectStateChange);
-    on<RealmUpdateSubscriptions>(_realmUpdateSubscriptions);
+    on<RealmMgmtLoginRequested>(_realmLoginStarted);
+    on<RealmMgmtLogoutRequested>(_realmLogoutStarted);
+    on<RealmMgmtConnectStateChanged>(_realmConnectStateChange);
+    on<RealmMgmtUpdateSubscriptionsStarted>(_realmUpdateSubscriptions);
   }
 
-  Future<void> _realmLoginStarted(RealmLoginStarted event, Emitter<RealmAuthorizedState> emit) async {
+  Future<void> _realmLoginStarted(RealmMgmtLoginRequested event, Emitter<RealmMgmtState> emit) async {
     try {
       final state = this.state;
       if (state.isLogin == true) {
@@ -29,7 +29,7 @@ class RealmAuthorizedBloc extends AbstractBloc<RealmAuthorizedEvent, RealmAuthor
         return;
       }
 
-      emit(const RealmAuthorizedStateLoading(
+      emit(const RealmMgmtLoadInProgress(
         isLogin: false,
         isUpdateSubscriptions: false,
         isRealmConnect: false,
@@ -39,14 +39,14 @@ class RealmAuthorizedBloc extends AbstractBloc<RealmAuthorizedEvent, RealmAuthor
       realmAuthorizedRepository.bindConnectionStreamListen(_connectionStream);
       realmAuthorizedRepository.bindUploadProgressStreamListen(_uploadProgressStream);
       realmAuthorizedRepository.bindDownloadProgressStreamListen(_downloadProgressStream);
-      emit(const RealmStatePermissionAuthenticated(isLogin: true, isUpdateSubscriptions: false, isRealmConnect: false));
+      emit(const RealmMgmtAuthenticatedSuccess(isLogin: true, isUpdateSubscriptions: false, isRealmConnect: false));
     } catch (e) {
       log('RealmLoginBloc _realmLoginStarted : ${e.toString()}');
-      emit(const RealmAuthorizedStateError(isLogin: false, isUpdateSubscriptions: false, isRealmConnect: false));
+      emit(const RealmMgmtLoadFailure(isLogin: false, isUpdateSubscriptions: false, isRealmConnect: false));
     }
   }
 
-  Future<void> _realmLogoutStarted(RealmLogoutStarted event, Emitter<RealmAuthorizedState> emit) async {
+  Future<void> _realmLogoutStarted(RealmMgmtLogoutRequested event, Emitter<RealmMgmtState> emit) async {
     try {
       final state = this.state;
       if (state.isLogin == false) {
@@ -62,26 +62,26 @@ class RealmAuthorizedBloc extends AbstractBloc<RealmAuthorizedEvent, RealmAuthor
       ));
     } catch (e) {
       log('RealmLoginBloc _realmLogoutStarted : ${e.toString()}');
-      emit(const RealmAuthorizedStateError(isLogin: false, isUpdateSubscriptions: false, isRealmConnect: false));
+      emit(const RealmMgmtLoadFailure(isLogin: false, isUpdateSubscriptions: false, isRealmConnect: false));
     }
   }
 
-  void _realmConnectStateChange(RealmConnectStateChange event, Emitter<RealmAuthorizedState> emit) {
+  void _realmConnectStateChange(RealmMgmtConnectStateChanged event, Emitter<RealmMgmtState> emit) {
     try {
       final state = this.state;
-      emit(RealmStatePermissionAuthenticated(
+      emit(RealmMgmtAuthenticatedSuccess(
         isLogin: true,
         isUpdateSubscriptions: state.isUpdateSubscriptions,
         isRealmConnect: event.isConnected,
       ));
     } catch (e) {
       log('RealmLoginBloc _realmLogoutStarted : ${e.toString()}');
-      emit(const RealmAuthorizedStateError(isLogin: true, isUpdateSubscriptions: false, isRealmConnect: false));
+      emit(const RealmMgmtLoadFailure(isLogin: true, isUpdateSubscriptions: false, isRealmConnect: false));
     }
   }
 
-  Future<void> _realmUpdateSubscriptions(RealmUpdateSubscriptions event, Emitter<RealmAuthorizedState> emit) async {
-    emit(const RealmAuthorizedStateLoading(
+  Future<void> _realmUpdateSubscriptions(RealmMgmtUpdateSubscriptionsStarted event, Emitter<RealmMgmtState> emit) async {
+    emit(const RealmMgmtLoadInProgress(
       isLogin: true,
       isUpdateSubscriptions: false,
       isRealmConnect: true,
@@ -97,14 +97,14 @@ class RealmAuthorizedBloc extends AbstractBloc<RealmAuthorizedEvent, RealmAuthor
       }
       await realmAuthorizedRepository.updateSubscriptions();
 
-      emit(const RealmStateSubscriptionsUpdated(
+      emit(const RealmMgmtSubscriptionsUpdatedSuccess(
         isLogin: true,
         isUpdateSubscriptions: true,
         isRealmConnect: true,
       ));
     } catch (e) {
       log('RealmLoginBloc _realmLogoutStarted : ${e.toString()}');
-      emit(const RealmAuthorizedStateError(isLogin: true, isUpdateSubscriptions: false, isRealmConnect: false));
+      emit(const RealmMgmtLoadFailure(isLogin: true, isUpdateSubscriptions: false, isRealmConnect: false));
     }
   }
 
@@ -112,11 +112,11 @@ class RealmAuthorizedBloc extends AbstractBloc<RealmAuthorizedEvent, RealmAuthor
     log("===============ConnectionStateChange ${event.current.name}===============");
 
     if (event.current == ConnectionState.connected) {
-      add(RealmConnectStateChange(isConnected: true));
+      add(RealmMgmtConnectStateChanged(isConnected: true));
     }
 
     if (event.current == ConnectionState.disconnected) {
-      add(RealmConnectStateChange(isConnected: false));
+      add(RealmMgmtConnectStateChanged(isConnected: false));
     }
   }
 

@@ -13,3 +13,13 @@ class AuthenticationLoginRequested extends AuthenticationEvent {
 }
 
 class AuthenticationLogoutRequested extends AuthenticationEvent {}
+
+class AuthenticationLDAPLoginRequested extends AuthenticationEvent {
+  AuthenticationLDAPLoginRequested() : super();
+}
+
+class AuthenticationLDAPPasswordChanged extends AuthenticationEvent {
+  final String password;
+
+  AuthenticationLDAPPasswordChanged({required this.password}) : super();
+}

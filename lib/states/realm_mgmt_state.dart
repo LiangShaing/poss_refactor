@@ -1,11 +1,11 @@
 import 'package:equatable/equatable.dart';
 
-abstract class RealmAuthorizedState<T> extends Equatable {
+abstract class RealmMgmtState<T> extends Equatable {
   final bool isLogin;
   final bool isUpdateSubscriptions;
   final bool isRealmConnect;
 
-  const RealmAuthorizedState({
+  const RealmMgmtState({
     required this.isLogin,
     required this.isUpdateSubscriptions,
     required this.isRealmConnect,
@@ -15,7 +15,7 @@ abstract class RealmAuthorizedState<T> extends Equatable {
   List<Object?> get props => [isLogin, isUpdateSubscriptions, isRealmConnect];
 }
 
-class RealmStatePermissionUnauthenticated extends RealmAuthorizedState {
+class RealmStatePermissionUnauthenticated extends RealmMgmtState {
   const RealmStatePermissionUnauthenticated(
       {required super.isLogin, required super.isUpdateSubscriptions, required super.isRealmConnect});
 
@@ -23,32 +23,32 @@ class RealmStatePermissionUnauthenticated extends RealmAuthorizedState {
   List<Object> get props => [];
 }
 
-class RealmAuthorizedStateLoading extends RealmAuthorizedState {
-  const RealmAuthorizedStateLoading(
+class RealmMgmtLoadInProgress extends RealmMgmtState {
+  const RealmMgmtLoadInProgress(
       {required super.isLogin, required super.isUpdateSubscriptions, required super.isRealmConnect});
 
   @override
   List<Object> get props => [];
 }
 
-class RealmStatePermissionAuthenticated extends RealmAuthorizedState {
-  const RealmStatePermissionAuthenticated(
+class RealmMgmtAuthenticatedSuccess extends RealmMgmtState {
+  const RealmMgmtAuthenticatedSuccess(
       {required super.isLogin, required super.isUpdateSubscriptions, required super.isRealmConnect});
 
   @override
   List<Object> get props => [];
 }
 
-class RealmAuthorizedStateError extends RealmAuthorizedState {
-  const RealmAuthorizedStateError(
+class RealmMgmtLoadFailure extends RealmMgmtState {
+  const RealmMgmtLoadFailure(
       {required super.isLogin, required super.isUpdateSubscriptions, required super.isRealmConnect});
 
   @override
   List<Object> get props => [];
 }
 
-class RealmStateSubscriptionsUpdated extends RealmAuthorizedState {
-  const RealmStateSubscriptionsUpdated(
+class RealmMgmtSubscriptionsUpdatedSuccess extends RealmMgmtState {
+  const RealmMgmtSubscriptionsUpdatedSuccess(
       {required super.isLogin, required super.isUpdateSubscriptions, required super.isRealmConnect});
 
   @override

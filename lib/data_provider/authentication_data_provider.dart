@@ -8,6 +8,7 @@ class AuthenticationDataProvider {
   }
 
   OauthService oauthService = ServiceFactory.createOauth();
+  UsersService usersService = ServiceFactory.createUsers();
 
   Future<bool> checkRefreshTokenExist() {
     return oauthService.checkRefreshTokenExists();
@@ -15,6 +16,10 @@ class AuthenticationDataProvider {
 
   Future<String> getOauthURL() {
     return oauthService.getOauthURL();
+  }
+
+  String getLogoutURL() {
+    return oauthService.getLogoutURL();
   }
 
   Future<bool> saveOauthToken(String code) {
@@ -26,11 +31,14 @@ class AuthenticationDataProvider {
   }
 
   Future<void> cleanOauth() {
-   return oauthService.cleanOauth();
+    return oauthService.cleanOauth();
   }
 
-  Future<bool> execRefreshToken(){
+  Future<bool> execRefreshToken() {
     return oauthService.execRefreshToken();
+  }
 
+  Future<bool> userVerified(String userId, String password) {
+    return usersService.userVerify(userId, password);
   }
 }

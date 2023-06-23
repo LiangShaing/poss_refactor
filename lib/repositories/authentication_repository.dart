@@ -11,6 +11,9 @@ class AuthenticationRepository {
     return authenticationDataProvider.getOauthURL();
   }
 
+  String getLogoutURL(){
+    return authenticationDataProvider.getLogoutURL();
+  }
 
   Future<bool> saveOauthToken(String code) {
     return authenticationDataProvider.saveOauthToken(code);
@@ -27,4 +30,10 @@ class AuthenticationRepository {
   Future<bool> execRefreshToken(){
     return authenticationDataProvider.execRefreshToken();
   }
+
+  Future<bool> userVerified(String userId, String password){
+    return authenticationDataProvider.userVerified(userId, password);
+  }
+
+
 }

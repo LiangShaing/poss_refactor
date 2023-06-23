@@ -6,6 +6,7 @@ import 'package:flutter_deep_link/flutter_deep_link.dart';
 import 'package:mobile_poss_gp01/blocs/realm_bloc.dart';
 import 'package:mobile_poss_gp01/enum/bloc_status.dart';
 import 'package:mobile_poss_gp01/events/authentication_event.dart';
+import 'package:mobile_poss_gp01/extension/string_extension.dart';
 import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/states/authentication_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
@@ -16,7 +17,9 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
   AuthenticationBloc({required this.authenticationRepository}) : super(const AuthenticationState()) {
     on<AuthenticationInitialed>(_init);
     on<AuthenticationLoginRequested>(_login);
+    on<AuthenticationLDAPLoginRequested>(_ldapLogin);
     on<AuthenticationLogoutRequested>(_logout);
+    on<AuthenticationLDAPPasswordChanged>(_inputLDAPPassword);
   }
 
   /// 驗證登入狀態
@@ -26,129 +29,112 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
     emit(state.copyWith(status: BlocStatus.loading));
 
     bool refreshTokenExist = await authenticationRepository.checkRefreshTokenExist();
-    // if (!event.isAutoLogin && !refreshTokenExist) {
-    //   return;
-    // }
-
     if (!refreshTokenExist) {
       Logger.debug(message: "refreshToken not exist");
+      emit(state.copyWith(status: BlocStatus.initial));
       Platform.isAndroid ? await _openBrowser() : await _openSafariService();
     } else {
       Logger.debug(message: "refreshToken exist");
 
-      bool bln = await authenticationRepository.execRefreshToken();
-      emit(state.copyWith(status: BlocStatus.success, refreshTokenExisted: true));
-
-      // Logger.debug(message: "execRefreshToken successful");
-      // userId = await oauthService.getUserId();
-
-      // if (["PKCS12", "CRT"].contains(certificateVerify)) {
-      //   //驗證憑證密碼
-      //   NewRelicPlugin.loginRecord(
-      //       className: "LoginPage", message: "Check OTP Success, with certificate [ $certificateVerify ]");
-      //   Logger.debug(message: "Check OTP Success, with certificate [ $certificateVerify ]");
-      //   String _certificatePwd = await ServiceFactory.getCertificatePwd();
-      //   if (_certificatePwd.isEmpty) {
-      //     NewRelicPlugin.loginRecord(
-      //         className: "LoginPage", message: "verifyAuth with certificate but certificate password is empty");
-      //     Logger.debug(message: "verifyAuth with certificate but certificate password is empty");
-      //     throw UnauthorizedException(message: "verifyAuth with certificate but certificate password is empty");
-      //   } else {
-      //     await ServiceFactory.setCertificatePwd(_certificatePwd);
-      //   }
-      // }
-
-      // // 已登入過OTP，判斷是否有生物辨識(加上前景才做生物辨識)，沒有則導向LDAP登入
-      // Logger.debug(message: " _checkToBackground [ $_checkToBackground ],");
-      // _loginType = LoginType.ldap;
+      try {
+        bool bln = await authenticationRepository.execRefreshToken();
+        emit(state.copyWith(
+            status: BlocStatus.success, refreshTokenExisted: true, accessTokenExisted: true, ldapVerified: true));
+        // if (["PKCS12", "CRT"].contains(certificateVerify)) {
+        //   //驗證憑證密碼
+        //   NewRelicPlugin.loginRecord(
+        //       className: "LoginPage", message: "Check OTP Success, with certificate [ $certificateVerify ]");
+        //   Logger.debug(message: "Check OTP Success, with certificate [ $certificateVerify ]");
+        //   String _certificatePwd = await ServiceFactory.getCertificatePwd();
+        //   if (_certificatePwd.isEmpty) {
+        //     NewRelicPlugin.loginRecord(
+        //         className: "LoginPage", message: "verifyAuth with certificate but certificate password is empty");
+        //     Logger.debug(message: "verifyAuth with certificate but certificate password is empty");
+        //     throw UnauthorizedException(message: "verifyAuth with certificate but certificate password is empty");
+        //   } else {
+        //     await ServiceFactory.setCertificatePwd(_certificatePwd);
+        //   }
+        // }
+      } catch (e) {
+        Logger.debug(message: "execRefreshToken unsuccessful");
+        add(AuthenticationLogoutRequested());
+      }
     }
-
-    // try {
-    //   Logger.debug(message: "refreshTokenExist [ $refreshTokenExist ]");
-    //   // NewRelicPlugin.loginRecord(
-    //   //     className: "LoginPage",
-    //   //     message: "verifyAuth fromLog [ $fromLog ], "
-    //   //         "refreshTokenExist [ $refreshTokenExist ]");
-    //   if (!refreshTokenExist) {
-    //     //先將狀態登出
-    //     _loginInfoModel.logout();
-    //     Logger.debug(message: "refreshToken not exist");
-    //     mounted ? setState(() => _isLoading = false) : null;
-    //
-    //     Platform.isAndroid ? await _openBrowser() : await _openSafariService();
-    //   } else {
-    //     Logger.debug(message: "refreshToken exist");
-    //     await oauthService.execRefreshToken();
-    //     Logger.debug(message: "execRefreshToken successful");
-    //     userId = await oauthService.getUserId();
-    //
-    //     if (["PKCS12", "CRT"].contains(certificateVerify)) {
-    //       //驗證憑證密碼
-    //       NewRelicPlugin.loginRecord(
-    //           className: "LoginPage", message: "Check OTP Success, with certificate [ $certificateVerify ]");
-    //       Logger.debug(message: "Check OTP Success, with certificate [ $certificateVerify ]");
-    //       String _certificatePwd = await ServiceFactory.getCertificatePwd();
-    //       if (_certificatePwd.isEmpty) {
-    //         NewRelicPlugin.loginRecord(
-    //             className: "LoginPage", message: "verifyAuth with certificate but certificate password is empty");
-    //         Logger.debug(message: "verifyAuth with certificate but certificate password is empty");
-    //         throw UnauthorizedException(message: "verifyAuth with certificate but certificate password is empty");
-    //       } else {
-    //         await ServiceFactory.setCertificatePwd(_certificatePwd);
-    //       }
-    //     }
-    //
-    //     // 已登入過OTP，判斷是否有生物辨識(加上前景才做生物辨識)，沒有則導向LDAP登入
-    //     Logger.debug(message: " _checkToBackground [ $_checkToBackground ],");
-    //     _loginType = LoginType.ldap;
-    //   }
-    // } on PlatformException catch (error) {
-    //   Logger.error(message: "LoginPage verifyAuth Exception:" + error.toString());
-    //   throw PlatformException(code: 'oauth', message: 'verify refresh token error : ${error.message.toString()}');
-    // } catch (e) {
-    //   if (mounted) {
-    //     setState(() {
-    //       _isLoading = false;
-    //     });
-    //     handleException(e, context, eventName: "LoginPage verifyAuth");
-    //   } else {
-    //     //解決使用者登如時滑掉app導致setState未完成
-    //     handleException(e, null, eventName: "LoginPage verifyAuth");
-    //   }
-    // } finally {
-    //   Logger.debug(message: "LoginPage verifyAuth finally");
-    //   mounted ? setState(() => {_loginType, _isLoading = false}) : null;
-    // }
   }
 
   Future<void> _login(AuthenticationLoginRequested event, Emitter<AuthenticationState> emit) async {
+    emit(state.copyWith(status: BlocStatus.loading));
+
     bool value = await authenticationRepository.saveOauthToken(event.code);
 
     if (value) {
       Logger.debug(message: "get oauth token success");
       // NewRelicPlugin.loginRecord(className: "LoginPage", message: "get oauth token success");
-      emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: true));
       String userId = await authenticationRepository.getUserId();
       Logger.debug(message: "_oauthTokenEndpoint  UserId: $userId");
       // NewRelicPlugin.userId(userId: userId);
-
-      emit(state.copyWith(status: BlocStatus.success, refreshTokenExisted: true, accessTokenExisted: true));
+      emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: true));
     } else {
-      emit(state.copyWith(status: BlocStatus.failure, refreshTokenExisted: false, accessTokenExisted: false));
-
-      // _loginInfoModel.logout();
       Logger.debug(message: "get oauth token unsuccessful");
-      // NewRelicPlugin.loginRecord(className: "LoginPage", message: "get oauth token unsuccessful");
+      add(AuthenticationLogoutRequested());
+    }
+  }
 
-      // show error messages
-      // _showMyDialog(Translate.of(context).getLan("base.login.msg.oauthLoginUnsuccessful"));
-      // 清掉所有storage
-      await authenticationRepository.cleanOauth();
+  void _inputLDAPPassword(AuthenticationLDAPPasswordChanged event, Emitter<AuthenticationState> emit) {
+    emit(state.copyWith(status: BlocStatus.initial, ldapPassword: event.password));
+  }
+
+  Future<void> _ldapLogin(AuthenticationLDAPLoginRequested event, Emitter<AuthenticationState> emit) async {
+    // NewRelicPlugin.loginRecord(className: "LoginPage", message: "_ldapLogin");
+    Logger.debug(message: "_ldapLogin");
+    try {
+      if (state.ldapPassword.isEmpty) {
+        emit(state.copyWith(
+            status: BlocStatus.failure,
+            refreshTokenExisted: true,
+            accessTokenExisted: false,
+            error: "base.login.msg.textFieldRequired".tr,
+            ldapVerified: true));
+      }
+      Logger.debug(message: "_ldapLogin [${state.ldapPassword}]");
+      emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: false));
+      //驗證ldap
+      String userId = await authenticationRepository.getUserId();
+      bool value = await authenticationRepository.userVerified(userId, state.ldapPassword);
+      if (value) {
+        Logger.debug(message: "verify LDAP successful");
+        emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: true));
+      } else {
+        emit(state.copyWith(
+            status: BlocStatus.failure,
+            refreshTokenExisted: true,
+            accessTokenExisted: false,
+            error: "base.login.msg.pwdUnsuccessful".tr,
+            ldapVerified: true,
+            ldapPassword: ''));
+      }
+    } catch (error) {
+      emit(state.copyWith(
+          status: BlocStatus.failure,
+          refreshTokenExisted: true,
+          accessTokenExisted: false,
+          error: error.toString(),
+          ldapVerified: true,
+          ldapPassword: ''));
     }
   }
 
   ///取得device id
-  Future<void> _logout(AuthenticationEvent event, Emitter<AuthenticationState> emit) async {}
+  Future<void> _logout(AuthenticationEvent event, Emitter<AuthenticationState> emit) async {
+    await authenticationRepository.cleanOauth();
+    _logoutOpenBrowser();
+    emit(state.copyWith(
+        status: BlocStatus.initial,
+        refreshTokenExisted: false,
+        accessTokenExisted: false,
+        error: '',
+        ldapVerified: false));
+  }
 
   ///Android打開瀏覽器
   Future<void> _openBrowser() async {
@@ -173,6 +159,21 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
       await FlutterDeepLink.openSafariService(url: url);
     } on PlatformException catch (error) {
       Logger.error(message: "LoginPage _openSafariService:$error");
+    }
+  }
+
+  ///登出開啟瀏覽器
+  Future<void> _logoutOpenBrowser() async {
+    String url = authenticationRepository.getLogoutURL();
+    Logger.debug(message: "_logout url $url");
+    try {
+      if (Platform.isAndroid) {
+        await FlutterDeepLink.openBrowser(url: url);
+      } else if (Platform.isIOS) {
+        await FlutterDeepLink.openSafariService(url: url);
+      }
+    } on PlatformException catch (error) {
+      Logger.error(message: "LogoutModel _logout:$error");
     }
   }
 }

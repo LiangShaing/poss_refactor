@@ -3,34 +3,24 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/app_init_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/authentication_bloc.dart';
-import 'package:mobile_poss_gp01/blocs/realm_authorized_bloc.dart';
+import 'package:mobile_poss_gp01/blocs/realm_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/enum/bloc_status.dart';
 import 'package:mobile_poss_gp01/events/authentication_event.dart';
-import 'package:mobile_poss_gp01/events/realm_authorized_event.dart';
+import 'package:mobile_poss_gp01/events/realm_mgmt_event.dart';
 import 'package:mobile_poss_gp01/extension/string_extension.dart';
 import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/resources/color_style.dart';
+import 'package:mobile_poss_gp01/resources/size_style.dart';
 import 'package:mobile_poss_gp01/routes/custom_page_route.dart';
 import 'package:mobile_poss_gp01/states/app_init_state.dart';
 import 'package:mobile_poss_gp01/states/authentication_state.dart';
-import 'package:mobile_poss_gp01/states/realm_authorized_state.dart';
+import 'package:mobile_poss_gp01/states/realm_mgmt_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_llnear_progressIndicator.dart';
 import 'package:mobile_poss_gp01/widgets/screens/index/index_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
-
-  // final AnimationController _linearIndicatorController = AnimationController(
-  //   animationBehavior: AnimationBehavior.preserve,
-  //   vsync: this,
-  //   duration: const Duration(seconds: 20),
-  // );
-
-  // LoginScreen(){
-  //   /* 進度條設定 */
-  //   _linearIndicatorController
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -53,14 +43,28 @@ class LoginScreen extends StatelessWidget {
                 }),
                 BlocListener<AuthenticationBloc, AuthenticationState>(
                   listener: (context, state) {
-                    if (state.status == BlocStatus.success) {
-                      BlocProvider.of<RealmAuthorizedBloc>(context).add(RealmLoginStarted());
+                    if (state.status == BlocStatus.loading && state.refreshTokenExisted && state.accessTokenExisted) {
+                      BlocProvider.of<RealmMgmtBloc>(context).add(RealmMgmtLoginRequested());
+                    }
+
+                    if (state.status == BlocStatus.failure) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: ColorStyle.warningRed.withOpacity(0.8),
+                        duration: const Duration(milliseconds: 3000),
+                        margin: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width * 0.3,
+                          right: MediaQuery.of(context).size.width * 0.3,
+                          bottom: MediaQuery.of(context).size.height - 100,
+                        ),
+                        content: Center(child: Text(state.error)),
+                      ));
                     }
                   },
                 ),
-                BlocListener<RealmAuthorizedBloc, RealmAuthorizedState>(
+                BlocListener<RealmMgmtBloc, RealmMgmtState>(
                   listener: (context, state) {
-                    if (state.runtimeType == RealmStatePermissionAuthenticated) {
+                    if (state.runtimeType == RealmMgmtAuthenticatedSuccess) {
                       SchedulerBinding.instance.addPostFrameCallback((_) {
                         Navigator.push(context, CustomPageRoute(builder: (context) {
                           return IndexScreen();
@@ -73,9 +77,8 @@ class LoginScreen extends StatelessWidget {
               child: Scaffold(
                 body: Column(
                   children: [
-                    BlocBuilder<RealmAuthorizedBloc, RealmAuthorizedState>(
-                        builder: (BuildContext context, RealmAuthorizedState state) {
-                      return state.runtimeType == RealmAuthorizedStateLoading
+                    BlocBuilder<RealmMgmtBloc, RealmMgmtState>(builder: (BuildContext context, RealmMgmtState state) {
+                      return state.runtimeType == RealmMgmtLoadInProgress
                           ? const MyLinearProgressIndicator()
                           : Container();
                     }),
@@ -106,40 +109,47 @@ class LoginScreen extends StatelessWidget {
 
     switch (state.status) {
       case BlocStatus.loading:
-        widget = ElevatedButton.icon(
-          onPressed: null,
-          icon: Container(
-            width: 24,
-            height: 24,
-            padding: const EdgeInsets.all(2.0),
-            child: const CircularProgressIndicator(
-              color: Colors.white,
-              strokeWidth: 3,
+        widget = Column(children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: SizedBox(
+              width: 400,
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: null,
+                icon: Container(
+                  width: 24,
+                  height: 24,
+                  padding: const EdgeInsets.all(2.0),
+                  child: const CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  ),
+                ),
+                label: Text(
+                  "widget.loading.msg.loading".tr,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white),
+                ),
+              ),
             ),
           ),
-          label: Text(
-            "widget.loading.msg.loading".tr,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white),
-          ),
-        );
+        ]);
         break;
-      case BlocStatus.failure:
-        widget = const Text('Something went wrong!');
-        break;
-      case BlocStatus.initial:
       default:
         widget = Column(
           children: [
-            if (state.refreshTokenExisted)
-              SizedBox(
+            if (state.ldapVerified) ...[
+              Container(
+                padding: const EdgeInsets.only(bottom: SizeStyle.paddingUnit),
                 width: 400,
                 child: TextField(
                   // controller: _passwordController,
                   obscureText: true,
                   style: const TextStyle(height: 1.0),
                   onChanged: (value) {
-                    // _password = value;
+                    context.read<AuthenticationBloc>().add(AuthenticationLDAPPasswordChanged(password: value));
                   },
+                  onSubmitted: (value) => context.read<AuthenticationBloc>().add(AuthenticationLDAPLoginRequested()),
                   decoration: InputDecoration(
                       focusedBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: ColorStyle.primary, width: 1.0),
@@ -156,27 +166,36 @@ class LoginScreen extends StatelessWidget {
                       helperStyle: const TextStyle(color: Colors.red)),
                 ),
               ),
-            ElevatedButton.icon(
-              onPressed: () => context.read<AuthenticationBloc>().add(AuthenticationLoginRequested(code: '')),
-              icon: const Icon(Icons.login),
-              label: Text(
-                "base.login.button.loginBtn".tr,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white),
+              SizedBox(
+                width: 400,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: () =>
+                      context.read<AuthenticationBloc>().add(AuthenticationLDAPLoginRequested()),
+                  icon: const Icon(Icons.login),
+                  label: Text(
+                    "base.login.button.loginBtn".tr,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white),
+                  ),
+                ),
+              )
+            ] else
+              SizedBox(
+                width: 400,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: () => context.read<AuthenticationBloc>().add(AuthenticationInitialed()),
+                  icon: const Icon(Icons.login),
+                  label: Text(
+                    "base.login.button.loginBtn".tr,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white),
+                  ),
+                ),
               ),
-            ),
           ],
         );
     }
 
-    return Column(children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: SizedBox(
-          width: 400,
-          height: 50,
-          child: widget,
-        ),
-      ),
-    ]);
+    return widget;
   }
 }
