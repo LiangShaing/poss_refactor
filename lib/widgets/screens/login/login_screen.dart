@@ -16,7 +16,7 @@ import 'package:mobile_poss_gp01/states/app_init_state.dart';
 import 'package:mobile_poss_gp01/states/authentication_state.dart';
 import 'package:mobile_poss_gp01/states/realm_mgmt_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
-import 'package:mobile_poss_gp01/widgets/components/my_llnear_progressIndicator.dart';
+import 'package:mobile_poss_gp01/widgets/components/my_linear_progressIndicator.dart';
 import 'package:mobile_poss_gp01/widgets/screens/index/index_screen.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -43,10 +43,11 @@ class LoginScreen extends StatelessWidget {
                 }),
                 BlocListener<AuthenticationBloc, AuthenticationState>(
                   listener: (context, state) {
+                    /* 登入成功接續登入realm */
                     if (state.status == BlocStatus.loading && state.refreshTokenExisted && state.accessTokenExisted) {
                       BlocProvider.of<RealmMgmtBloc>(context).add(RealmMgmtLoginRequested());
                     }
-
+                    /* 錯誤 */
                     if (state.status == BlocStatus.failure) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         behavior: SnackBarBehavior.floating,
@@ -138,7 +139,7 @@ class LoginScreen extends StatelessWidget {
       default:
         widget = Column(
           children: [
-            if (state.ldapVerified) ...[
+            if (state.ldapVerified)
               Container(
                 padding: const EdgeInsets.only(bottom: SizeStyle.paddingUnit),
                 width: 400,
@@ -166,32 +167,20 @@ class LoginScreen extends StatelessWidget {
                       helperStyle: const TextStyle(color: Colors.red)),
                 ),
               ),
-              SizedBox(
-                width: 400,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: () =>
-                      context.read<AuthenticationBloc>().add(AuthenticationLDAPLoginRequested()),
-                  icon: const Icon(Icons.login),
-                  label: Text(
-                    "base.login.button.loginBtn".tr,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white),
-                  ),
-                ),
-              )
-            ] else
-              SizedBox(
-                width: 400,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: () => context.read<AuthenticationBloc>().add(AuthenticationInitialed()),
-                  icon: const Icon(Icons.login),
-                  label: Text(
-                    "base.login.button.loginBtn".tr,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white),
-                  ),
+            SizedBox(
+              width: 400,
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: () => context
+                    .read<AuthenticationBloc>()
+                    .add(state.ldapVerified ? AuthenticationLDAPLoginRequested() : AuthenticationInitialed()),
+                icon: const Icon(Icons.login),
+                label: Text(
+                  "base.login.button.loginBtn".tr,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white),
                 ),
               ),
+            ),
           ],
         );
     }
