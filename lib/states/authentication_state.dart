@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:mobile_poss_gp01/enum/bloc_status.dart';
 
 class AuthenticationState extends Equatable {
+  final bool inLoginScreen;
   final bool refreshTokenExisted;
   final bool accessTokenExisted;
   final bool ldapVerified;
@@ -10,7 +11,8 @@ class AuthenticationState extends Equatable {
   final BlocStatus status;
 
   const AuthenticationState(
-      {this.refreshTokenExisted = false,
+      {this.inLoginScreen = true,
+      this.refreshTokenExisted = false,
       this.accessTokenExisted = false,
       this.ldapVerified = false,
       this.ldapPassword = '',
@@ -19,16 +21,19 @@ class AuthenticationState extends Equatable {
       : super();
 
   @override
-  List<Object?> get props => [refreshTokenExisted, accessTokenExisted, ldapVerified, ldapPassword, error, status];
+  List<Object?> get props =>
+      [inLoginScreen, refreshTokenExisted, accessTokenExisted, ldapVerified, ldapPassword, error, status];
 
   AuthenticationState copyWith(
-      {bool? refreshTokenExisted,
+      {bool? inLoginScreen,
+      bool? refreshTokenExisted,
       bool? accessTokenExisted,
       bool? ldapVerified,
       String? ldapPassword,
       String? error,
       BlocStatus? status}) {
     return AuthenticationState(
+      inLoginScreen: inLoginScreen ?? this.inLoginScreen,
       refreshTokenExisted: refreshTokenExisted ?? this.refreshTokenExisted,
       accessTokenExisted: accessTokenExisted ?? this.accessTokenExisted,
       ldapVerified: ldapVerified ?? this.ldapVerified,

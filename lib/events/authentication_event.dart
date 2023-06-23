@@ -23,3 +23,7 @@ class AuthenticationLDAPPasswordChanged extends AuthenticationEvent {
 
   AuthenticationLDAPPasswordChanged({required this.password}) : super();
 }
+
+class AuthenticationLoginScreenLeaved extends AuthenticationEvent {
+  AuthenticationLoginScreenLeaved() : super();
+}

@@ -20,6 +20,7 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
     on<AuthenticationLDAPLoginRequested>(_ldapLogin);
     on<AuthenticationLogoutRequested>(_logout);
     on<AuthenticationLDAPPasswordChanged>(_inputLDAPPassword);
+    on<AuthenticationLoginScreenLeaved>(_loginScreenLeaved);
   }
 
   /// 驗證登入狀態
@@ -29,6 +30,11 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
     emit(state.copyWith(status: BlocStatus.loading));
 
     bool refreshTokenExist = await authenticationRepository.checkRefreshTokenExist();
+
+    // if(!state.inLoginScreen){
+    //   add(AuthenticationLogoutRequested());
+    // }
+
     if (!refreshTokenExist) {
       Logger.debug(message: "refreshToken not exist");
       emit(state.copyWith(status: BlocStatus.initial));
@@ -128,6 +134,10 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
         emit(state.copyWith(status: BlocStatus.initial, error: ''));
       }
     }
+  }
+
+  Future<void> _loginScreenLeaved(AuthenticationLoginScreenLeaved event, Emitter<AuthenticationState> emit) async {
+    emit(state.copyWith(inLoginScreen: false));
   }
 
   ///取得device id
