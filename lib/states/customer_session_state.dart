@@ -5,18 +5,18 @@ abstract class CustomerSessionState<T> extends Equatable {
   const CustomerSessionState();
 }
 
-class CustomerSessionInitial extends CustomerSessionState {
+class CustomerSessionLoadInitial extends CustomerSessionState {
   @override
   List<Object> get props => [];
 }
 
-class CustomerSessionLoading extends CustomerSessionState {
+class CustomerSessionInProgress extends CustomerSessionState {
   @override
   List<Object> get props => [];
 }
 
-class CustomerSessionLoaded extends CustomerSessionState {
-  const CustomerSessionLoaded({this.customerSession});
+class CustomerSessionLoadSuccess extends CustomerSessionState {
+  const CustomerSessionLoadSuccess({this.customerSession});
 
   final CustomerSession? customerSession;
 
@@ -24,7 +24,7 @@ class CustomerSessionLoaded extends CustomerSessionState {
   List<Object?> get props => [customerSession];
 }
 
-class CustomerSessionError extends CustomerSessionState {
+class CustomerSessionLoadFailure extends CustomerSessionState {
   @override
   List<Object> get props => [];
 }

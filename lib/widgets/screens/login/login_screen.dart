@@ -50,7 +50,7 @@ class LoginScreen extends StatelessWidget {
                     if (state.status == BlocStatus.failure) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         behavior: SnackBarBehavior.floating,
-                        backgroundColor: ColorStyle.warningRed.withOpacity(0.8),
+                        backgroundColor: ColorStyle.warningRed.withOpacity(0.6),
                         duration: const Duration(milliseconds: 3000),
                         margin: EdgeInsets.only(
                           left: MediaQuery.of(context).size.width * 0.3,

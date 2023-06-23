@@ -13,7 +13,7 @@ class IndexScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<CustomerSessionBloc>(
       create: (BuildContext context) =>
-      CustomerSessionBloc(customerSessionRepository: CustomerSessionRepository())..add(CustomerSessionSearched()),
+      CustomerSessionBloc(customerSessionRepository: CustomerSessionRepository())..add(CustomerSessionInitialed()),
       child: BlocBuilder<CustomerSessionBloc, CustomerSessionState>(
           bloc: CustomerSessionBloc(customerSessionRepository: CustomerSessionRepository()), builder: _builder),
     );
@@ -24,17 +24,17 @@ class IndexScreen extends StatelessWidget {
 
 
     switch (state.runtimeType) {
-      case CustomerSessionInitial:
+      case CustomerSessionLoadInitial:
         widget = const Text('--');
         break;
-      case CustomerSessionLoading:
+      case CustomerSessionInProgress:
         widget = const CircularProgressIndicator();
         break;
-      case CustomerSessionError:
+      case CustomerSessionLoadFailure:
         widget = const Text('Something went wrong!');
         break;
-      case CustomerSessionLoaded:
-        CustomerSessionLoaded data = state as CustomerSessionLoaded;
+      case CustomerSessionLoadSuccess:
+        CustomerSessionLoadSuccess data = state as CustomerSessionLoadSuccess;
         widget = Text(data.customerSession?.code ?? "");
         break;
       default:

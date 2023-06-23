@@ -1,7 +1,7 @@
 
 abstract class CustomerSessionEvent {}
 
-class CustomerSessionSearched extends CustomerSessionEvent {}
+class CustomerSessionInitialed extends CustomerSessionEvent {}
 
 class CustomerSessionStarted extends CustomerSessionEvent {}
 
