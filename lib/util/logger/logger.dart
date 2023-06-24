@@ -38,4 +38,13 @@ class Logger {
     log("Screen [$screen]");
     // NewRelicPlugin.screen(screen: screen);
   }
+
+  /// System Print login
+  ///
+  /// Param require message: String
+  static login({required String message, String status = "INFO", String className = "", String event = ""}) {
+    log("className[$className] page[LoginScreen] event[$event] [$status] : $message");
+    // NewRelicPlugin.customMessage(
+    //     eventName: "INFO", message: "className[$className] page[$page] event[$event] [INFO] : $message");
+  }
 }

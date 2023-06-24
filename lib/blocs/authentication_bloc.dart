@@ -25,7 +25,7 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
 
   /// 驗證登入狀態
   Future<void> _init(AuthenticationInitialed event, Emitter<AuthenticationState> emit) async {
-    Logger.debug(message: "AuthenticationBloc _init isAutoLogin[${event.isAutoLogin}]");
+    Logger.login(className: "AuthenticationBloc", event: "_init", message: "start");
     if (!event.isAutoLogin) {
       emit(const AuthenticationState());
       return;
@@ -34,9 +34,9 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
     emit(state.copyWith(status: BlocStatus.loading));
 
     bool refreshTokenExist = await authenticationRepository.checkRefreshTokenExist();
+    Logger.login(className: "AuthenticationBloc", event: "_init", message: "refreshToken exist [$refreshTokenExist]");
 
     if (!refreshTokenExist) {
-      Logger.debug(message: "refreshToken not exist");
       emit(state.copyWith(status: BlocStatus.initial));
       Platform.isAndroid ? await _openBrowser() : await _openSafariService();
     } else {
@@ -44,6 +44,7 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
 
       try {
         bool bln = await authenticationRepository.execRefreshToken();
+        Logger.login(className: "AuthenticationBloc", event: "_init", message: "execRefreshToken successful");
         emit(state.copyWith(
             status: BlocStatus.success, refreshTokenExisted: true, accessTokenExisted: true, ldapVerified: true));
         // if (["PKCS12", "CRT"].contains(certificateVerify)) {
@@ -62,7 +63,8 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
         //   }
         // }
       } catch (e) {
-        Logger.debug(message: "execRefreshToken unsuccessful");
+        Logger.login(
+            className: "AuthenticationBloc", event: "_init", status: "ERROR", message: "execRefreshToken unsuccessful");
         add(AuthenticationLogoutRequested());
       }
     }
@@ -74,14 +76,13 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
     bool value = await authenticationRepository.saveOauthToken(event.code);
 
     if (value) {
-      Logger.debug(message: "get oauth token success");
-      // NewRelicPlugin.loginRecord(className: "LoginPage", message: "get oauth token success");
+      Logger.login(className: "AuthenticationBloc", event: "_login", message: "get oauth token success");
       String userId = await authenticationRepository.getUserId();
       Logger.debug(message: "_oauthTokenEndpoint  UserId: $userId");
-      // NewRelicPlugin.userId(userId: userId);
       emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: true));
     } else {
-      Logger.debug(message: "get oauth token unsuccessful");
+      Logger.login(
+          className: "AuthenticationBloc", event: "_login", status: "ERROR", message: "get oauth token unsuccessful");
       add(AuthenticationLogoutRequested());
     }
   }
@@ -91,8 +92,10 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
   }
 
   Future<void> _ldapLogin(AuthenticationLDAPLoginRequested event, Emitter<AuthenticationState> emit) async {
-    // NewRelicPlugin.loginRecord(className: "LoginPage", message: "_ldapLogin");
-    Logger.debug(message: "_ldapLogin");
+    Logger.login(
+        className: "AuthenticationBloc",
+        event: "_ldapLogin",
+        message: "started ldapPassword isEmpty[${state.ldapPassword.isEmpty}]");
     try {
       if (state.ldapPassword.isEmpty) {
         Logger.debug(message: "_ldapLogin ldapPassword isEmpty");
@@ -108,6 +111,7 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
         //驗證ldap
         String userId = await authenticationRepository.getUserId();
         bool value = await authenticationRepository.userVerified(userId, state.ldapPassword);
+        Logger.login(className: "AuthenticationBloc", event: "_ldapLogin", message: "verify LDAP successful");
         if (value) {
           Logger.debug(message: "verify LDAP successful");
           emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: true));
@@ -122,6 +126,7 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
         }
       }
     } catch (error) {
+      Logger.login(className: "AuthenticationBloc", event: "_ldapLogin", status: "ERROR", message: error.toString());
       emit(state.copyWith(
           status: BlocStatus.failure,
           refreshTokenExisted: true,
@@ -137,11 +142,13 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
   }
 
   Future<void> _loginScreenLeaved(AuthenticationLoginScreenLeaved event, Emitter<AuthenticationState> emit) async {
+    Logger.login(className: "AuthenticationBloc", event: "_loginScreenLeaved", message: "started");
     emit(state.copyWith(inLoginScreen: false));
   }
 
   ///取得device id
   Future<void> _logout(AuthenticationEvent event, Emitter<AuthenticationState> emit) async {
+    Logger.login(className: "AuthenticationBloc", event: "_logout", message: "started");
     await authenticationRepository.cleanOauth();
     await _logoutOpenBrowser();
     emit(const AuthenticationState());
@@ -149,32 +156,36 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
 
   ///Android打開瀏覽器
   Future<void> _openBrowser() async {
-    Logger.debug(message: "LoginPage _openBrowser");
+    Logger.login(className: "AuthenticationBloc", event: "_openBrowser", message: "started");
     // NewRelicPlugin.loginRecord(className: "LoginPage", message: "_openBrowser");
     //取得oauth 路徑
     String url = await authenticationRepository.getOauthURL();
     try {
       await FlutterDeepLink.openBrowser(url: url);
     } on PlatformException catch (error) {
-      Logger.error(message: "LoginPage _openBrowser:$error");
+      Logger.login(
+          className: "AuthenticationBloc",
+          event: "_openBrowser",
+          status: "ERROR",
+          message: "LoginPage _openBrowser:$error");
     }
   }
 
   ///IOS打開瀏覽器
   Future<void> _openSafariService() async {
-    Logger.debug(message: "LoginPage _openSafariService");
-    // NewRelicPlugin.loginRecord(className: "LoginPage", message: "_openSafariService");
+    Logger.login(className: "AuthenticationBloc", event: "_openSafariService", message: "started");
     //取得oauth 路徑
     String url = await authenticationRepository.getOauthURL();
     try {
       await FlutterDeepLink.openSafariService(url: url);
     } on PlatformException catch (error) {
-      Logger.error(message: "LoginPage _openSafariService:$error");
+      Logger.login(className: "AuthenticationBloc", event: "_openSafariService", status: "ERROR", message: "$error");
     }
   }
 
   ///登出開啟瀏覽器
   Future<void> _logoutOpenBrowser() async {
+    Logger.login(className: "AuthenticationBloc", event: "_logoutOpenBrowser", message: "started");
     String url = authenticationRepository.getLogoutURL();
     Logger.debug(message: "_logout url $url");
     try {
@@ -184,7 +195,7 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
         await FlutterDeepLink.openSafariService(url: url);
       }
     } on PlatformException catch (error) {
-      Logger.error(message: "LogoutModel _logout:$error");
+      Logger.login(className: "AuthenticationBloc", event: "_logoutOpenBrowser", status: "ERROR", message: "$error");
     }
   }
 }
