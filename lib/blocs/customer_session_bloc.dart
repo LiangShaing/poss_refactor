@@ -18,6 +18,11 @@ class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSes
     on<CustomerSessionInitialed>(_initialCustomerSession);
     on<CustomerSessionStarted>(_createCustomerSession);
     on<CustomerSessionTerminated>(_closeCustomerSession);
+
+    customerSessionRepository.bindCustomerSessionResultsStreamListen((event) {
+      Logger.debug(message: "CustomerSessionBloc bindCustomerSessionResultsStreamListen");
+      add(CustomerSessionInitialed());
+    });
   }
 
   Future<void> _createCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
@@ -35,8 +40,20 @@ class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSes
     add(CustomerSessionInitialed());
   }
 
-  Future<void> _initialCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
+  Future<void> _searchCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
     log("_searchCustomerSession");
+    emit(CustomerSessionInProgress());
+    CustomerSession? currentCustomerSession = customerSessionRepository.currentCustomerSession;
+    log("_searchCustomerSession [${currentCustomerSession?.id}]");
+    if (currentCustomerSession == null) {
+      emit(CustomerSessionLoadInitial());
+    } else {
+      emit(CustomerSessionLoadSuccess(customerSession: currentCustomerSession));
+    }
+  }
+
+  Future<void> _initialCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
+    Logger.info(className: "CustomerSessionBloc", event: "_initialCustomerSession", message: "started");
     emit(CustomerSessionInProgress());
     CustomerSession? currentCustomerSession = customerSessionRepository.currentCustomerSession;
     log("_searchCustomerSession [${currentCustomerSession?.id}]");
