@@ -6,7 +6,6 @@ import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
 import 'package:mobile_poss_gp01/states/customer_session_state.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_scaffold_stateful_widget.dart';
 
-
 class IndexScreen extends StatelessWidget {
   const IndexScreen({super.key});
 
@@ -45,16 +44,18 @@ class IndexScreen extends StatelessWidget {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[widget],
+          children: <Widget>[
+            widget,
+            ElevatedButton(
+              onPressed: () async {
+                context.read<CustomerSessionBloc>().add(CustomerSessionStarted());
+              },
+              child: Text("test"),
+            )
+          ],
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     context.read<CustomerSessionBloc>().add(CustomerSessionStarted());
-      //   },
-      //   tooltip: 'Increment',
-      //   child: const Icon(Icons.add),
-      // ), // This trailing comma makes auto-formatting nicer for build methods.
+      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

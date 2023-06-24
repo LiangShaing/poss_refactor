@@ -25,6 +25,16 @@ class CustomerSessionRepository extends RealmRepository {
     });
   }
 
+  Future<void> closeCustomerSession(CustomerSession customerSession) async {
+    realmSyncDao.realm.write(() {
+      // realmSyncDao.realm.add(customerSession,update: true);
+      /* 所有 checkInIndicator false */
+      customerSessionResults?.where((e) => e.employeeId == customerSession.employeeId).forEach((e) {
+        e.checkInIndicator = false;
+      });
+    });
+  }
+
   CustomerSession? get currentCustomerSession {
     return customerSessionResults?.lastOrNull;
   }

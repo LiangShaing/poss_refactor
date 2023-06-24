@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
-import 'package:mobile_poss_gp01/database_objects/realm/model/customer_session.dart';
+import 'package:mobile_poss_gp01/database_objects/realm/model/realm_models.dart';
 import 'package:realm/realm.dart';
 
 class RealmDaoException implements Exception {
@@ -145,6 +145,8 @@ class RealmSyncDao {
       CatalogItemTitle.schema,
       BookingUnit.schema,
       BookingUnitsCbu.schema,
+      /* GoldRate */
+      // GoldRate.schema,
     ], syncErrorHandler: (SyncError error) {
       _log("[createRealm][syncErrorHandler] Error message : ${error.message.toString()}");
     }, clientResetHandler: ManualRecoveryHandler((clientResetError) {
