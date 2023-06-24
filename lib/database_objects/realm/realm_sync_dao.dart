@@ -146,7 +146,7 @@ class RealmSyncDao {
       BookingUnit.schema,
       BookingUnitsCbu.schema,
       /* GoldRate */
-      // GoldRate.schema,
+      GoldRate.schema,
     ], syncErrorHandler: (SyncError error) {
       _log("[createRealm][syncErrorHandler] Error message : ${error.message.toString()}");
     }, clientResetHandler: ManualRecoveryHandler((clientResetError) {
@@ -175,6 +175,7 @@ class RealmSyncDao {
     _realm?.subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.clear();
       mutableSubscriptions.add(customerSessionResults!);
+      mutableSubscriptions.add(_realm!.all<GoldRate>());
     });
 
     debugPrint("customerSessionResults.length ==================== ${customerSessionResults?.length}");
