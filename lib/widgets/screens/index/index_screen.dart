@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile_poss_gp01/blocs/app_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/customer_session_bloc.dart';
-import 'package:mobile_poss_gp01/events/app_mgmt_event.dart';
 import 'package:mobile_poss_gp01/events/customer_session_event.dart';
 import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
 import 'package:mobile_poss_gp01/states/customer_session_state.dart';
-import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_scaffold_stateful_widget.dart';
+
 
 class IndexScreen extends StatelessWidget {
   const IndexScreen({super.key});

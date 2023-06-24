@@ -1,0 +1,62 @@
+import 'package:flutter/material.dart';
+import 'package:mobile_poss_gp01/extension/string_extension.dart';
+import 'package:mobile_poss_gp01/widgets/components/my_bottom_app_bar_stateless_widget.dart';
+
+
+class StaticValues {
+  static RegExp catalogItemCodeRegexp = RegExp(r'^[A-Za-z0-9]+-[A-Za-z0-9]+-[A-Za-z0-9]+$');
+
+  static const List<String> saleTypes = ['store', 'remote'];
+
+  static const List<EngravingFontOption> engravingFonts = [
+    EngravingFontOption(name: 'Times 楷書', fontFamily: 'Times'),
+    EngravingFontOption(name: 'Arial 楷書', fontFamily: 'Arial'),
+    EngravingFontOption(name: 'Edwardian 楷書', fontFamily: 'Edwardian'),
+  ];
+
+  static const List<String> symbols = ['♥', '♡', '&'];
+
+  static List<MyBottomAppBarItem> bottomAppBarNavigation = [
+    MyBottomAppBarItem(
+      0,
+      i18nName: "QR code",
+      icon: Icons.qr_code,
+      // pushRoute: PossMobileRoute.qrcodeScannerPageRouteName,
+      pushRoute: '/pagea',
+
+    ),
+
+    MyBottomAppBarItem(
+      1,
+      widget: Container(),
+      // i18nName: "銷售交易",
+      // icon: Icons.manage_search,
+      // pushRoute: PossMobileRoute.salePLPPageRouteName,
+    ),
+    MyBottomAppBarItem(
+      2,
+      widget: Container(),
+      // i18nName: "金價匯率",
+      // icon: Icons.shopping_cart,
+      // pushRoute: PossMobileRoute.cartPageRouteName,
+    ),
+    MyBottomAppBarItem(
+      3,
+      i18nName: "widget.myBottomAppBar.label.shoppingCart".tr,
+      icon: Icons.shopping_cart,
+      // pushRoute: PossMobileRoute.cartPageRouteName,
+      pushRoute: '/pageb',
+
+    ),
+  ];
+}
+
+class EngravingFontOption {
+  final String name;
+  final String fontFamily;
+
+  const EngravingFontOption({
+    required this.name,
+    required this.fontFamily,
+  });
+}

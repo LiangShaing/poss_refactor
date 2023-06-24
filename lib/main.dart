@@ -14,12 +14,12 @@ import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/repositories/realm_authorized_repository.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/realm_sync_dao.dart';
 import 'package:mobile_poss_gp01/resources/theme.dart';
+import 'package:mobile_poss_gp01/routes/base/base_route.dart';
+import 'package:mobile_poss_gp01/routes/generate_route.dart';
 import 'package:mobile_poss_gp01/states/app_mgmt_state.dart';
 import 'package:mobile_poss_gp01/states/locailzation_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/components/app_life_cycle_manager_stateful_widget.dart';
-import 'package:mobile_poss_gp01/widgets/screens/index/index_screen.dart';
-import 'package:mobile_poss_gp01/widgets/screens/login/login_screen.dart';
 import 'package:realm/realm.dart';
 import 'blocs/localization_bloc.dart';
 import 'events/app_mgmt_event.dart';
@@ -27,7 +27,7 @@ import 'events/app_mgmt_event.dart';
 GlobalKey<NavigatorState> navigationKey = GlobalKey();
 
 void main() async {
-  Realm.logger.level = RealmLogLevel.debug;
+  // Realm.logger.level = RealmLogLevel.debug;
   WidgetsFlutterBinding.ensureInitialized();
   RealmSyncDao.setAppId("mobile-poss-sit-bjtiq");
   RealmSyncDao.setApiKeyCredentials("lfMqV7VzxKqLLZswpvALaldEnacjaQG31cPueHNs3ZCBL2Xg5x0zLaExl8sU6T4a");
@@ -87,16 +87,17 @@ class MyApp extends StatelessWidget {
                       return null;
                     },
                     locale: state.locale,
-                    initialRoute: "/",
-                    routes: {
-                      '/': (context) => const LoginScreen(),
-                      // '/': (context) => const RealmLoginScreen(),
-                      "/index": (context) => const IndexScreen(),
-                    },
-                    // initialRoute: BaseRoute.loginPageRouteName,
-                    // onGenerateRoute: (settings) {
-                    //   return GenerateRoute.route(routeSettings: settings);
+                    // initialRoute: "/",
+                    // routes: {
+                    //   '/': (context) => const LoginScreen(),
+                    //   "/index": (context) => const IndexScreen(),
+                    //   "/pagea": (context) => const PageAScreen(),
+                    //   "/pageb": (context) => const PageBScreen(),
                     // },
+                    initialRoute: BaseRoute.loginScreenRouteName,
+                    onGenerateRoute: (settings) {
+                      return GenerateRoute.route(routeSettings: settings);
+                    },
                   ),
                 );
               });

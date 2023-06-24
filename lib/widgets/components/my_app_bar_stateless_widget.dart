@@ -11,7 +11,10 @@ import 'package:mobile_poss_gp01/events/authentication_event.dart';
 import 'package:mobile_poss_gp01/events/realm_mgmt_event.dart';
 import 'package:mobile_poss_gp01/extension/string_extension.dart';
 import 'package:mobile_poss_gp01/resources/size_style.dart';
+import 'package:mobile_poss_gp01/routes/base/arguments/login_screen_route_arguments.dart';
+import 'package:mobile_poss_gp01/routes/base/base_route.dart';
 import 'package:mobile_poss_gp01/routes/custom_page_route.dart';
+import 'package:mobile_poss_gp01/routes/my_navigator.dart';
 import 'package:mobile_poss_gp01/states/app_mgmt_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/screens/login/login_screen.dart';
@@ -277,9 +280,8 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
                               BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLogoutRequested());
 
                               SchedulerBinding.instance.addPostFrameCallback((_) {
-                                Navigator.pushAndRemoveUntil(context, CustomPageRoute(builder: (context) {
-                                  return const LoginScreen(isAutoLogin: false);
-                                }),(route)=>false);
+                                MyNavigator.pushReset(
+                                    BaseRoute.loginScreenRouteName, LoginScreenArguments(isAutoLogin: false));
                               });
                             }
                           });

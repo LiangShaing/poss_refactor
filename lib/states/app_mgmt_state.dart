@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:mobile_poss_gp01/enum/bloc_status.dart';
 
 class AppMgmtState extends Equatable {
-  const AppMgmtState({this.deviceId = "", this.drawer = false, this.status = BlocStatus.initial}) : super();
+  const AppMgmtState({this.deviceId = "", this.drawer = true, this.status = BlocStatus.initial}) : super();
 
   final String deviceId;
   final bool drawer;

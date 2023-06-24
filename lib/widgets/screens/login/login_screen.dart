@@ -11,25 +11,27 @@ import 'package:mobile_poss_gp01/extension/string_extension.dart';
 import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/resources/color_style.dart';
 import 'package:mobile_poss_gp01/resources/size_style.dart';
+import 'package:mobile_poss_gp01/routes/base/arguments/login_screen_route_arguments.dart';
+import 'package:mobile_poss_gp01/routes/base/base_route.dart';
 import 'package:mobile_poss_gp01/routes/custom_page_route.dart';
+import 'package:mobile_poss_gp01/routes/my_navigator.dart';
 import 'package:mobile_poss_gp01/states/app_mgmt_state.dart';
 import 'package:mobile_poss_gp01/states/authentication_state.dart';
 import 'package:mobile_poss_gp01/states/realm_mgmt_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_linear_progressIndicator.dart';
-import 'package:mobile_poss_gp01/widgets/screens/index/index_screen.dart';
 
 class LoginScreen extends StatelessWidget {
-  final bool isAutoLogin;
+  final LoginScreenArguments args;
 
-  const LoginScreen({super.key, this.isAutoLogin = true});
+  const LoginScreen({super.key, required this.args});
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return BlocProvider(
         create: (BuildContext context) => AuthenticationBloc(authenticationRepository: AuthenticationRepository())
-          ..add(AuthenticationInitialed(isAutoLogin: isAutoLogin)),
+          ..add(AuthenticationInitialed(isAutoLogin: args.isAutoLogin)),
         child: WillPopScope(
             onWillPop: () async {
               return true;
@@ -70,9 +72,7 @@ class LoginScreen extends StatelessWidget {
                     if (state.runtimeType == RealmMgmtAuthenticatedSuccess) {
                       BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginScreenLeaved());
                       SchedulerBinding.instance.addPostFrameCallback((_) {
-                        Navigator.pushAndRemoveUntil(context, CustomPageRoute(builder: (context) {
-                          return IndexScreen();
-                        }),(route)=>false);
+                        MyNavigator.pushReset(BaseRoute.menuScreenRouteName);
                       });
                     }
                   },
