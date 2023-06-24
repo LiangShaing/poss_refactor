@@ -2,14 +2,14 @@ abstract class AppMgmtEvent {}
 
 class AppMgmtInitialed extends AppMgmtEvent {}
 
-class AppMgmtCASCodeReturned extends AppMgmtEvent {
+class AppMgmtOauthCodeReturned extends AppMgmtEvent {
   final String code;
 
-  AppMgmtCASCodeReturned({required this.code}) : super();
+  AppMgmtOauthCodeReturned({required this.code}) : super();
 }
 
-class AppMgmtDrawerShowed extends AppMgmtEvent {
-  AppMgmtDrawerShowed() : super();
+class AppMgmtDrawerOpened extends AppMgmtEvent {
+  AppMgmtDrawerOpened() : super();
 }
 
 class AppMgmtDrawerClosed extends AppMgmtEvent {

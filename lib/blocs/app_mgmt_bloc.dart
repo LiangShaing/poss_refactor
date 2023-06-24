@@ -12,23 +12,24 @@ import 'package:mobile_poss_gp01/util/logger/logger.dart';
 
 class AppMgmtBloc extends AbstractBloc<AppMgmtEvent, AppMgmtState> {
   AppMgmtBloc() : super(const AppMgmtState()) {
-    on<AppMgmtInitialed>(_appInit);
-    on<AppMgmtCASCodeReturned>(_deepLinkCodeReturned);
-    on<AppMgmtDrawerShowed>(_showDrawer);
-    on<AppMgmtDrawerClosed>(_closeDrawer);
+    on<AppMgmtInitialed>(_appInitialed);
+    on<AppMgmtOauthCodeReturned>(_oauthCodeReturned);
+    on<AppMgmtDrawerOpened>(_drawerOpened);
+    on<AppMgmtDrawerClosed>(_drawerClosed);
   }
 
-  Future<void> _appInit(AppMgmtEvent event, Emitter<AppMgmtState> emit) async {
+  Future<void> _appInitialed(AppMgmtEvent event, Emitter<AppMgmtState> emit) async {
+    Logger.info(className: "AppMgmtBloc", event: "_appInitialed", message: "started");
     String deviceId = await _getDeviceId();
     if (deviceId.isEmpty) {
+      Logger.error(className: "AppMgmtBloc", event: "_appInitialed", message: "deviceId.isEmpty");
       emit(state.copyWith(status: BlocStatus.failure));
     }
     _initHandleDeepLink();
-    // emit(AppMgmtState(deviceId: deviceId, status: BlocStatus.success));
     emit(state.copyWith(deviceId: deviceId, status: BlocStatus.success));
   }
 
-  Future<void> _deepLinkCodeReturned(AppMgmtCASCodeReturned event, Emitter<AppMgmtState> emit) async {
+  Future<void> _oauthCodeReturned(AppMgmtOauthCodeReturned event, Emitter<AppMgmtState> emit) async {
     Logger.debug(message: "_deepLinkCodeReturned [${event.code}]");
     emit(AppMgmtDeepLinkCodeLoadSuccess(code: event.code));
   }
@@ -44,7 +45,9 @@ class AppMgmtBloc extends AbstractBloc<AppMgmtEvent, AppMgmtState> {
       IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
       deviceId = iosDeviceInfo.identifierForVendor ?? "Unknown ID";
     }
-    // NewRelicPlugin.loginRecord(className: "LoginPage", message: "_getDeviceId exist [ ${_deviceId.isNotEmpty} ]");
+    Logger.info(
+        className: "AppMgmtBloc", event: "_getDeviceId", message: "_getDeviceId exist [ ${deviceId.isNotEmpty} ]");
+
     if (deviceId.isEmpty) {
       Logger.error(message: "LoginPage device id is empty");
     }
@@ -55,32 +58,30 @@ class AppMgmtBloc extends AbstractBloc<AppMgmtEvent, AppMgmtState> {
 
   /// 初始化deep link function
   void _initHandleDeepLink() {
-    Logger.debug(message: "_initHandleDeepLink");
-    // NewRelicPlugin.loginRecord(className: "LoginPage", message: "_initHandleDeepLink");
+    Logger.info(className: "AppMgmtBloc", event: "_initHandleDeepLink", message: "started");
     FlutterDeepLink.streamDeepLinkResult?.listen((deepLink) {
       String code = _urlParser(deepLink);
       if (code.isNotEmpty) {
-        add(AppMgmtCASCodeReturned(code: code));
+        Logger.debug(className: "AppMgmtBloc", message: "_initHandleDeepLink code[$code]");
+        add(AppMgmtOauthCodeReturned(code: code));
       }
     });
   }
 
   /// Oauth登入完成後執行
   String _urlParser(String deepLink) {
-    Logger.debug(message: "_urlParser: $deepLink");
-    // NewRelicPlugin.loginRecord(
-    //     className: "LoginPage", message: "_urlParser, _isOpenBrowserStatus: $_isOpenBrowserStatus");
+    Logger.info(className: "AppMgmtBloc", event: "_urlParser", message: "_urlParser: $deepLink");
     Uri uri = Uri.parse(deepLink);
     // 取得從CAS回來的code
     String code = uri.queryParameters['code'] ?? "";
     return code;
   }
 
-  void _showDrawer(AppMgmtEvent event, Emitter<AppMgmtState> emit) {
+  void _drawerOpened(AppMgmtEvent event, Emitter<AppMgmtState> emit) {
     emit(state.copyWith(drawer: true));
   }
 
-  void _closeDrawer(AppMgmtEvent event, Emitter<AppMgmtState> emit) {
+  void _drawerClosed(AppMgmtEvent event, Emitter<AppMgmtState> emit) {
     emit(state.copyWith(drawer: false));
   }
 }

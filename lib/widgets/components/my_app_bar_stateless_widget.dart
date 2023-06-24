@@ -145,7 +145,7 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
                         icon: const Icon(Icons.menu_open_outlined, color: Colors.black, size: 32));
                   } else if (!state.drawer) {
                     widget = IconButton(
-                        onPressed: () => BlocProvider.of<AppMgmtBloc>(context).add(AppMgmtDrawerShowed()),
+                        onPressed: () => BlocProvider.of<AppMgmtBloc>(context).add(AppMgmtDrawerOpened()),
                         icon: const Icon(Icons.menu, color: Colors.black, size: 32));
                   }
                   return widget;
@@ -277,9 +277,9 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
                               BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLogoutRequested());
 
                               SchedulerBinding.instance.addPostFrameCallback((_) {
-                                Navigator.push(context, CustomPageRoute(builder: (context) {
+                                Navigator.pushAndRemoveUntil(context, CustomPageRoute(builder: (context) {
                                   return const LoginScreen(isAutoLogin: false);
-                                }));
+                                }),(route)=>false);
                               });
                             }
                           });

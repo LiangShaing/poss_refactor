@@ -7,9 +7,9 @@ class Logger {
   ///
   /// Param require message: String
   static debug({required String? message, String className = ""}) {
-    String _log = message.toString();
-    if (className != "") _log = "className[$className] : $message";
-    log(_log);
+    String str = message.toString();
+    if (className != "") str = "className[$className] : $message";
+    log(str);
   }
 
   /// System Print Info
