@@ -26,7 +26,7 @@ class IndexScreen extends StatelessWidget {
       case CustomerSessionLoadInitial:
         widget = const Text('--');
         break;
-      case CustomerSessionInProgress:
+      case CustomerSessionLoadInProgress:
         widget = const CircularProgressIndicator();
         break;
       case CustomerSessionLoadFailure:

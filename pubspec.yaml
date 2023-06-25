@@ -47,7 +47,8 @@ dependencies:
   android_id: 0.3.2
   shimmer: ^2.0.0
   horizontal_data_table: 4.1.5
-#  sliding_up_panel: ^2.0.0+1
+  sliding_up_panel: ^2.0.0+1
+  flutter_slidable: ^1.0.0
   chowsangsang_enterprise_portal:
     path: ../chowsangsang_enterprise_portal
   flutter_deep_link:

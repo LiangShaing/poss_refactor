@@ -10,7 +10,7 @@ class RealmMgmtBloc extends AbstractBloc<RealmMgmtEvent, RealmMgmtState> {
   final RealmAuthorizedRepository realmAuthorizedRepository;
 
   RealmMgmtBloc({required this.realmAuthorizedRepository})
-      : super(const RealmStatePermissionUnauthenticated(
+      : super(const RealmMgmtAuthenticatedInitial(
           isLogin: false,
           isUpdateSubscriptions: false,
           isRealmConnect: false,
@@ -55,7 +55,7 @@ class RealmMgmtBloc extends AbstractBloc<RealmMgmtEvent, RealmMgmtState> {
       }
       await realmAuthorizedRepository.closeRealm();
       await realmAuthorizedRepository.logOut();
-      emit(const RealmStatePermissionUnauthenticated(
+      emit(const RealmMgmtAuthenticatedInitial(
         isLogin: false,
         isUpdateSubscriptions: false,
         isRealmConnect: false,

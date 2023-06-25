@@ -29,7 +29,7 @@ class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSes
     //todo use repository
     //todo emit here
     /* 當前已有會客序號: 關閉當前會客 */
-    emit(CustomerSessionInProgress());
+    emit(CustomerSessionLoadInProgress());
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('HHmmss');
     final String formatted = formatter.format(now);
@@ -42,7 +42,7 @@ class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSes
 
   Future<void> _searchCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
     log("_searchCustomerSession");
-    emit(CustomerSessionInProgress());
+    emit(CustomerSessionLoadInProgress());
     CustomerSession? currentCustomerSession = customerSessionRepository.currentCustomerSession;
     log("_searchCustomerSession [${currentCustomerSession?.id}]");
     if (currentCustomerSession == null) {
@@ -54,7 +54,7 @@ class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSes
 
   Future<void> _initialCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
     Logger.info(className: "CustomerSessionBloc", event: "_initialCustomerSession", message: "started");
-    emit(CustomerSessionInProgress());
+    emit(CustomerSessionLoadInProgress());
     CustomerSession? currentCustomerSession = customerSessionRepository.currentCustomerSession;
     log("_searchCustomerSession [${currentCustomerSession?.id}]");
     if (currentCustomerSession == null) {
@@ -66,7 +66,7 @@ class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSes
 
   Future<void> _closeCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
     Logger.info(className: "CustomerSessionBloc", event: "_closeCustomerSession", message: "started");
-    emit(CustomerSessionInProgress());
+    emit(CustomerSessionLoadInProgress());
     CustomerSession? currentCustomerSession = customerSessionRepository.currentCustomerSession;
 
     if (currentCustomerSession != null) {

@@ -10,7 +10,7 @@ class CustomerSessionLoadInitial extends CustomerSessionState {
   List<Object> get props => [];
 }
 
-class CustomerSessionInProgress extends CustomerSessionState {
+class CustomerSessionLoadInProgress extends CustomerSessionState {
   @override
   List<Object> get props => [];
 }

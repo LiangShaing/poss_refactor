@@ -15,8 +15,8 @@ abstract class RealmMgmtState<T> extends Equatable {
   List<Object?> get props => [isLogin, isUpdateSubscriptions, isRealmConnect];
 }
 
-class RealmStatePermissionUnauthenticated extends RealmMgmtState {
-  const RealmStatePermissionUnauthenticated(
+class RealmMgmtAuthenticatedInitial extends RealmMgmtState {
+  const RealmMgmtAuthenticatedInitial(
       {required super.isLogin, required super.isUpdateSubscriptions, required super.isRealmConnect});
 
   @override
