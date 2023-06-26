@@ -45,8 +45,7 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
       try {
         bool bln = await authenticationRepository.execRefreshToken();
         Logger.login(className: "AuthenticationBloc", event: "_init", message: "execRefreshToken successful");
-        emit(state.copyWith(
-            status: BlocStatus.success, refreshTokenExisted: true, accessTokenExisted: true, ldapVerified: true));
+        emit(state.copyWith(status: BlocStatus.initial,refreshTokenExisted: true, accessTokenExisted: true, ldapVerified: true));
         // if (["PKCS12", "CRT"].contains(certificateVerify)) {
         //   //驗證憑證密碼
         //   NewRelicPlugin.loginRecord(
@@ -79,7 +78,7 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
       Logger.login(className: "AuthenticationBloc", event: "_login", message: "get oauth token success");
       String userId = await authenticationRepository.getUserId();
       Logger.debug(message: "_oauthTokenEndpoint  UserId: $userId");
-      emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: true));
+      emit(state.copyWith(status: BlocStatus.success, refreshTokenExisted: true, accessTokenExisted: true));
     } else {
       Logger.login(
           className: "AuthenticationBloc", event: "_login", status: "ERROR", message: "get oauth token unsuccessful");
@@ -114,7 +113,7 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
         Logger.login(className: "AuthenticationBloc", event: "_ldapLogin", message: "verify LDAP successful");
         if (value) {
           Logger.debug(message: "verify LDAP successful");
-          emit(state.copyWith(status: BlocStatus.loading, refreshTokenExisted: true, accessTokenExisted: true));
+          emit(state.copyWith(status: BlocStatus.success, refreshTokenExisted: true, accessTokenExisted: true));
         } else {
           emit(state.copyWith(
               status: BlocStatus.failure,

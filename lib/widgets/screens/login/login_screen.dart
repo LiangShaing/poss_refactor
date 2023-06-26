@@ -48,7 +48,7 @@ class LoginScreen extends StatelessWidget {
                 BlocListener<AuthenticationBloc, AuthenticationState>(
                   listener: (context, state) {
                     /* 登入成功接續登入realm */
-                    if (state.status == BlocStatus.loading && state.refreshTokenExisted && state.accessTokenExisted) {
+                    if (state.status == BlocStatus.success && state.refreshTokenExisted && state.accessTokenExisted) {
                       BlocProvider.of<RealmMgmtBloc>(context).add(RealmMgmtLoginRequested());
                       BlocProvider.of<RealmMgmtBloc>(context).add(RealmMgmtUpdateSubscriptionsStarted());
                     }
@@ -139,6 +139,9 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
         ]);
+        break;
+      case BlocStatus.success:
+        widget = Text("widget.loading.msg.loading".tr, style: Theme.of(context).textTheme.headlineSmall);
         break;
       default:
         widget = Column(
