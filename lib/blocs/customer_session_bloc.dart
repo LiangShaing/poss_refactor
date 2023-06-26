@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_poss_gp01/blocs/realm_bloc.dart';
+import 'package:mobile_poss_gp01/database_objects/user/pojo/employee_pojo.dart';
 import 'package:mobile_poss_gp01/enum/customer_session_progress_status.dart';
 import 'package:mobile_poss_gp01/events/customer_session_event.dart';
+import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/model/realm_models.dart';
 import 'package:mobile_poss_gp01/states/customer_session_state.dart';
@@ -13,32 +15,53 @@ import 'package:realm/realm.dart';
 
 class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSessionState> {
   final CustomerSessionRepository customerSessionRepository;
+  final AuthenticationRepository authenticationRepository;
 
-  CustomerSessionBloc({required this.customerSessionRepository}) : super(CustomerSessionLoadInitial()) {
+  CustomerSessionBloc({required this.customerSessionRepository, required this.authenticationRepository})
+      : super(CustomerSessionLoadInitial()) {
     on<CustomerSessionInitialed>(_initialCustomerSession);
     on<CustomerSessionStarted>(_createCustomerSession);
     on<CustomerSessionTerminated>(_closeCustomerSession);
 
-    customerSessionRepository.bindCustomerSessionResultsStreamListen((event) {
-      Logger.debug(message: "CustomerSessionBloc bindCustomerSessionResultsStreamListen");
-      add(CustomerSessionInitialed());
+    // customerSessionRepository.bindCustomerSessionResultsStreamListen(
+    //     EmployeePOJO("梁紫泳", "223720", "422",[]), (event) {
+    //   Logger.debug(message: "CustomerSessionBloc bindCustomerSessionResultsStreamListen");
+    //   add(CustomerSessionInitialed());
+    // });
+
+    Future(() async {
+      Map<String, dynamic> userInfo = await authenticationRepository.getTokenInfo();
+      List<String> displayName = userInfo['displayName'].toString().split(" ");
+
+      customerSessionRepository.bindCustomerSessionResultsStreamListen(
+          EmployeePOJO(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), []), (event) {
+        Logger.debug(message: "CustomerSessionBloc bindCustomerSessionResultsStreamListen");
+        add(CustomerSessionInitialed());
+      });
     });
   }
 
-  Future<void> _createCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
+  Future<void> _createCustomerSession(CustomerSessionStarted event, Emitter<CustomerSessionState> emit) async {
     Logger.info(className: "CustomerSessionBloc", event: "_createCustomerSession", message: "started");
     /* 當前已有會客序號: 關閉當前會客 */
     emit(CustomerSessionLoadInProgress());
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('HHmmss');
     final String formatted = formatter.format(now);
-    CustomerSession customerSession = CustomerSession(ObjectId(), true, DateTime.now().toUtc(), "689", "221470", "梁小翔",
-        code: "221470-$formatted", currentProgress: "SELLING");
+    Map<String, dynamic> userInfo = await authenticationRepository.getTokenInfo();
+    List<String> displayName = userInfo['displayName'].toString().split(" ");
+    Logger.debug(
+        message:
+            "_createCustomerSession user : ${displayName.elementAt(0)} ${userInfo['uid'][0]} ${displayName.elementAt(1)}");
+
+    CustomerSession customerSession = CustomerSession(ObjectId(), true, DateTime.now().toUtc(),
+        displayName.elementAt(0), userInfo['uid'][0], displayName.elementAt(1),
+        code: "${userInfo['uid'][0]}-$formatted", currentProgress: "SELLING");
     await customerSessionRepository.createCustomerSession(customerSession);
     add(CustomerSessionInitialed());
   }
 
-  Future<void> _initialCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
+  Future<void> _initialCustomerSession(CustomerSessionInitialed event, Emitter<CustomerSessionState> emit) async {
     Logger.info(className: "CustomerSessionBloc", event: "_initialCustomerSession", message: "started");
     emit(CustomerSessionLoadInProgress());
     CustomerSession? currentCustomerSession = customerSessionRepository.currentCustomerSession;

@@ -1,5 +1,7 @@
+import 'package:chowsangsang_enterprise_portal/service_factory.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/realm_bloc.dart';
+import 'package:mobile_poss_gp01/database_objects/realm/pojo/subscription_req.dart';
 import 'package:mobile_poss_gp01/events/realm_mgmt_event.dart';
 import 'package:mobile_poss_gp01/repositories/realm_authorized_repository.dart';
 import 'package:mobile_poss_gp01/states/realm_mgmt_state.dart';
@@ -80,7 +82,8 @@ class RealmMgmtBloc extends AbstractBloc<RealmMgmtEvent, RealmMgmtState> {
     }
   }
 
-  Future<void> _realmUpdateSubscriptions(RealmMgmtUpdateSubscriptionsStarted event, Emitter<RealmMgmtState> emit) async {
+  Future<void> _realmUpdateSubscriptions(
+      RealmMgmtUpdateSubscriptionsStarted event, Emitter<RealmMgmtState> emit) async {
     emit(const RealmMgmtLoadInProgress(
       isLogin: true,
       isUpdateSubscriptions: false,
@@ -94,8 +97,13 @@ class RealmMgmtBloc extends AbstractBloc<RealmMgmtEvent, RealmMgmtState> {
       } else if (state.isUpdateSubscriptions == true) {
         log("_realmUpdateSubscriptions is sync");
         return;
+      } else if (event.employeePOJO == null) {
+        log("_realmUpdateSubscriptions is sync");
+        throw IllegalArgumentException("_realmUpdateSubscriptions employeePOJO is empty");
       }
-      await realmAuthorizedRepository.updateSubscriptions();
+
+      await realmAuthorizedRepository.updateSubscriptions(
+          SubscriptionReq(event.employeePOJO!.employeeId, event.employeePOJO!.defaultDepartmentCode));
 
       emit(const RealmMgmtSubscriptionsUpdatedSuccess(
         isLogin: true,

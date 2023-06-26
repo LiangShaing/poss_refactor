@@ -30,6 +30,10 @@ class AuthenticationDataProvider {
     return oauthService.getUserId();
   }
 
+  Future<Map<String, dynamic>> getTokenInfo() {
+    return oauthService.getTokenInfo();
+  }
+
   Future<void> cleanOauth() {
     return oauthService.cleanOauth();
   }

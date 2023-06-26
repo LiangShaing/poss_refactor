@@ -2,12 +2,14 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
+import 'package:mobile_poss_gp01/blocs/authentication_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/customer_session_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/gold_rate_bloc.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/pojo/gold_rate_pojo.dart';
 import 'package:mobile_poss_gp01/events/customer_session_event.dart';
 import 'package:mobile_poss_gp01/extension/string_extension.dart';
 import 'package:mobile_poss_gp01/mixins/common_function.dart';
+import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
 import 'package:mobile_poss_gp01/repositories/gold_rate_repository.dart';
 import 'package:mobile_poss_gp01/resources/color_style.dart';
@@ -201,7 +203,7 @@ class MenuScreen extends StatelessWidget with CommonFunction {
             'func': () async {
               // BlocProvider.of<CustomerSessionBloc>(context).add(CustomerSessionStarted());
               // BlocProvider.of<CustomerSessionBloc>(context).state;
-              BlocProvider.of<CustomerSessionBloc>(context).add(CustomerSessionStarted());
+              // BlocProvider.of<CustomerSessionBloc>(context).add(CustomerSessionStarted());
               // if (IndexPageState.customerService.getCurrentCustomerSession()?.isNotEmpty == true) {
               //   /* 當前已有會客序號: 關閉當前會客 */
               //   bool _isConfirm = await showAlertWithResp(context, "widget.appbar.label.closeCustomerSession".tr,
@@ -255,9 +257,10 @@ class MenuScreen extends StatelessWidget with CommonFunction {
     return MultiBlocProvider(
         providers: [
           BlocProvider<CustomerSessionBloc>(
-            create: (BuildContext context) =>
-                CustomerSessionBloc(customerSessionRepository: CustomerSessionRepository())
-                  ..add(CustomerSessionInitialed()),
+            create: (BuildContext context) => CustomerSessionBloc(
+                customerSessionRepository: CustomerSessionRepository(),
+                authenticationRepository: AuthenticationRepository())
+              ..add(CustomerSessionInitialed()),
           ),
           BlocProvider<GoldRateBloc>(
             create: (BuildContext context) => GoldRateBloc(goldRateRepository: GoldRateRepository()),

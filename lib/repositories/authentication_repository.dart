@@ -23,6 +23,10 @@ class AuthenticationRepository {
     return authenticationDataProvider.getUserId();
   }
 
+  Future<Map<String, dynamic>> getTokenInfo(){
+    return authenticationDataProvider.getTokenInfo();
+  }
+
   Future<void> cleanOauth() {
     return authenticationDataProvider.cleanOauth();
   }

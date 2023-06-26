@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:mobile_poss_gp01/database_objects/user/pojo/employee_pojo.dart';
 import 'package:mobile_poss_gp01/repositories/repository.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/model/customer_session.dart';
 import 'package:realm/realm.dart';
@@ -9,13 +10,16 @@ class CustomerSessionRepository extends RealmRepository {
   StreamSubscription? _realmCustomerSessionResultsStream;
   RealmResults<CustomerSession>? customerSessionResults;
 
-  CustomerSessionRepository() {
-    customerSessionResults = realmSyncDao.realm.query<CustomerSession>(
-        r'departmentCode == $0 AND employeeId==$1 AND checkInIndicator == $2', ["689", "221470", true]);
-  }
+  // CustomerSessionRepository() {
+  //   customerSessionResults = realmSyncDao.realm.query<CustomerSession>(
+  //       r'departmentCode == $0 AND employeeId==$1 AND checkInIndicator == $2', ["689", "221470", true]);
+  // }
 
-  void bindCustomerSessionResultsStreamListen(callbackFun) {
+  void bindCustomerSessionResultsStreamListen(EmployeePOJO employeePOJO, callbackFun) {
     _realmCustomerSessionResultsStream?.cancel();
+    customerSessionResults = realmSyncDao.realm.query<CustomerSession>(
+        r'departmentCode == $0 AND employeeId==$1 AND checkInIndicator == $2',
+        [employeePOJO.defaultDepartmentCode, employeePOJO.employeeId, true]);
     _realmCustomerSessionResultsStream = customerSessionResults?.changes.listen(callbackFun);
   }
 

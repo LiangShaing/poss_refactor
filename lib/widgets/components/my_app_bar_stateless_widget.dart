@@ -12,21 +12,18 @@ import 'package:mobile_poss_gp01/events/authentication_event.dart';
 import 'package:mobile_poss_gp01/events/customer_session_event.dart';
 import 'package:mobile_poss_gp01/events/realm_mgmt_event.dart';
 import 'package:mobile_poss_gp01/extension/string_extension.dart';
+import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
 import 'package:mobile_poss_gp01/resources/color_style.dart';
 import 'package:mobile_poss_gp01/resources/size_style.dart';
 import 'package:mobile_poss_gp01/routes/base/arguments/login_screen_route_arguments.dart';
 import 'package:mobile_poss_gp01/routes/base/base_route.dart';
-import 'package:mobile_poss_gp01/routes/custom_page_route.dart';
 import 'package:mobile_poss_gp01/routes/my_navigator.dart';
 import 'package:mobile_poss_gp01/states/app_mgmt_state.dart';
 import 'package:mobile_poss_gp01/states/customer_session_state.dart';
 import 'package:mobile_poss_gp01/states/realm_mgmt_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_text_stateless_widget.dart';
-import 'package:mobile_poss_gp01/widgets/screens/login/login_screen.dart';
-import 'package:provider/provider.dart';
-import 'package:realm/realm.dart';
 
 class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
   final bool isShowBack;
@@ -114,7 +111,7 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
   //   }
   // }
 
-  static final TextEditingController _searchController = TextEditingController();
+  // static final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -143,6 +140,45 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
                   }
                   return widget;
                 }),
+                /* 搜尋商品輸入欄 */
+                Container(
+                  width: 200,
+                  height: SizeStyle.buttonHeightMedium,
+                  margin: const EdgeInsets.only(left: SizeStyle.paddingUnit),
+                  child: TextField(
+                    // controller: _searchController,
+                    maxLines: 1,
+                    style: const TextStyle(fontSize: 17),
+                    textAlignVertical: TextAlignVertical.center,
+                    onSubmitted: (String value) {},
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: const Color.fromRGBO(252, 252, 252, 1),
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
+                        onPressed: () => null,
+                      ),
+                      border: const OutlineInputBorder(
+                          borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(30))),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: SizeStyle.paddingUnit * 2),
+                    ),
+                    // onSubmitted: (String value) => value.isNotEmpty ? _showAddToCartDialog(value, context) : null,
+                    // decoration: InputDecoration(
+                    //   filled: true,
+                    //   fillColor: const Color.fromRGBO(252, 252, 252, 1),
+                    //   suffixIcon: IconButton(
+                    //     icon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
+                    //     onPressed: () => _searchController.text.isNotEmpty
+                    //         ? _showAddToCartDialog(_searchController.text, context)
+                    //         : null,
+                    //   ),
+                    //   border: const OutlineInputBorder(
+                    //       borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(30))),
+                    //   contentPadding: const EdgeInsets.symmetric(horizontal: SizeStyle.paddingUnit * 2),
+                    // ),
+                  ),
+                )
+
                 // StreamBuilder<RealmResultsChanges<CustomerSession>>(
                 //   stream: IndexPageState.customerService.getCurrentCustomerSession()?.changes,
                 //   builder: (context, snapshot) {
@@ -204,9 +240,10 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
                     children: [
                       /* 會客序號 */
                       BlocProvider<CustomerSessionBloc>(
-                          create: (BuildContext context) =>
-                              CustomerSessionBloc(customerSessionRepository: CustomerSessionRepository())
-                                ..add(CustomerSessionInitialed()),
+                          create: (BuildContext context) => CustomerSessionBloc(
+                              customerSessionRepository: CustomerSessionRepository(),
+                              authenticationRepository: AuthenticationRepository())
+                            ..add(CustomerSessionInitialed()),
                           child: BlocBuilder<CustomerSessionBloc, CustomerSessionState>(builder: (context, state) {
                             if (state.runtimeType == CustomerSessionLoadSuccess) {
                               return Row(

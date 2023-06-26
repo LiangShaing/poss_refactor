@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/customer_session_bloc.dart';
 import 'package:mobile_poss_gp01/events/customer_session_event.dart';
+import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
 import 'package:mobile_poss_gp01/states/customer_session_state.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_scaffold_stateful_widget.dart';
@@ -12,10 +13,14 @@ class IndexScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<CustomerSessionBloc>(
-      create: (BuildContext context) =>
-          CustomerSessionBloc(customerSessionRepository: CustomerSessionRepository())..add(CustomerSessionInitialed()),
+      create: (BuildContext context) => CustomerSessionBloc(
+          customerSessionRepository: CustomerSessionRepository(), authenticationRepository: AuthenticationRepository())
+        ..add(CustomerSessionInitialed()),
       child: BlocBuilder<CustomerSessionBloc, CustomerSessionState>(
-          bloc: CustomerSessionBloc(customerSessionRepository: CustomerSessionRepository()), builder: _builder),
+          bloc: CustomerSessionBloc(
+              customerSessionRepository: CustomerSessionRepository(),
+              authenticationRepository: AuthenticationRepository()),
+          builder: _builder),
     );
   }
 
@@ -48,7 +53,7 @@ class IndexScreen extends StatelessWidget {
             widget,
             ElevatedButton(
               onPressed: () async {
-                context.read<CustomerSessionBloc>().add(CustomerSessionStarted());
+                // context.read<CustomerSessionBloc>().add(CustomerSessionStarted());
               },
               child: Text("test"),
             )

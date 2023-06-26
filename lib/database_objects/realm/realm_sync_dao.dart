@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/model/realm_models.dart';
+import 'package:mobile_poss_gp01/database_objects/realm/pojo/subscription_req.dart';
+import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:realm/realm.dart';
 
 class RealmDaoException implements Exception {
@@ -21,6 +23,7 @@ class RealmSyncDao {
   static User? _user;
   static Credentials? _credentials;
   static bool? _loginCheckNetworkStatus;
+
   // static RealmResults<CustomerSession>? customerSessionResults;
 
   RealmSyncDao._();
@@ -132,6 +135,9 @@ class RealmSyncDao {
     }
     _log("[createRealm] path: ${Configuration.defaultRealmPath}");
     Configuration config = Configuration.flexibleSync(_user!, [
+      /* PersonalizedSettings */
+      //TODO:個人化設定 單一登入還未實作
+      // EmployeePersonalizedSetting.schema,
       /* CustomerSession */
       CustomerSession.schema,
       BrowsingHistories.schema,
@@ -147,6 +153,25 @@ class RealmSyncDao {
       BookingUnitsCbu.schema,
       /* GoldRate */
       GoldRate.schema,
+      /* CatalogItem */
+      CatalogItem.schema,
+      Reference.schema,
+      Collection.schema,
+      ProductSampleInfoObject.schema,
+      ProductTagType.schema,
+      /* Inventory */
+      Inventory.schema,
+      Bom.schema,
+      Weight.schema,
+      InventoryReference.schema,
+      InventoryCertificates.schema,
+      BomCertificate.schema,
+      /* Model */
+      Model.schema,
+      ModelReference.schema,
+      ProductTitle.schema,
+      /* Earmark */
+      Earmark.schema
     ], syncErrorHandler: (SyncError error) {
       _log("[createRealm][syncErrorHandler] Error message : ${error.message.toString()}");
     }, clientResetHandler: ManualRecoveryHandler((clientResetError) {
@@ -159,18 +184,25 @@ class RealmSyncDao {
     _log("[createRealm] finish, _realm.path: ${_realm?.config.path}");
   }
 
-  Future<void> updateSubscriptions() async {
+  Future<void> updateSubscriptions(SubscriptionReq subscriptionReq) async {
     if (_realm == null) {
       throw RealmDaoException("[updateSubscriptions] RealmSyncDao realm null");
     }
-
-   final customerSessionResults = _realm?.query<CustomerSession>(
-        r'departmentCode == $0 AND employeeId==$1 AND checkInIndicator == $2', ["689", "221470", true]);
 
     if (await isNetworkConnect() == false) {
       _log("[updateSubscriptions] not network.");
       return;
     }
+
+    final customerSessionResults = _realm?.query<CustomerSession>(
+        r'departmentCode == $0 AND employeeId==$1 AND checkInIndicator == $2',
+        [subscriptionReq.defaultDepartmentCode, subscriptionReq.employeeId, true]);
+    Logger.debug(
+        message:
+            "customerSessionResults query:[departmentCode == ${subscriptionReq.defaultDepartmentCode} AND employeeId==${subscriptionReq.employeeId} AND checkInIndicator == true]");
+    // final inventoryResults = realm.query<Inventory>(r'custodianDepartmentCode == $0', [_departmentCode]);
+    // final modelResults = realm.query<Model>(r"departmentCodes == $0", [_departmentCode]);
+    // final catalogItemResults = realm.query<CatalogItem>(r'departmentCodes == $0', [_departmentCode]);
 
     _realm?.subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.clear();

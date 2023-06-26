@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_deep_link/flutter_deep_link.dart';
 import 'package:mobile_poss_gp01/blocs/realm_bloc.dart';
+import 'package:mobile_poss_gp01/database_objects/user/pojo/employee_pojo.dart';
 import 'package:mobile_poss_gp01/enum/bloc_status.dart';
 import 'package:mobile_poss_gp01/events/authentication_event.dart';
 import 'package:mobile_poss_gp01/extension/string_extension.dart';
@@ -45,7 +46,8 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
       try {
         bool bln = await authenticationRepository.execRefreshToken();
         Logger.login(className: "AuthenticationBloc", event: "_init", message: "execRefreshToken successful");
-        emit(state.copyWith(status: BlocStatus.initial,refreshTokenExisted: true, accessTokenExisted: true, ldapVerified: true));
+        emit(state.copyWith(
+            status: BlocStatus.initial, refreshTokenExisted: true, accessTokenExisted: true, ldapVerified: true));
         // if (["PKCS12", "CRT"].contains(certificateVerify)) {
         //   //驗證憑證密碼
         //   NewRelicPlugin.loginRecord(
@@ -76,9 +78,16 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
 
     if (value) {
       Logger.login(className: "AuthenticationBloc", event: "_login", message: "get oauth token success");
-      String userId = await authenticationRepository.getUserId();
-      Logger.debug(message: "_oauthTokenEndpoint  UserId: $userId");
-      emit(state.copyWith(status: BlocStatus.success, refreshTokenExisted: true, accessTokenExisted: true));
+      Map<String, dynamic> userInfo = await authenticationRepository.getTokenInfo();
+      List<String> displayName = userInfo['displayName'].toString().split(" ");
+      Logger.debug(
+          message: "Login user : ${displayName.elementAt(0)} ${userInfo['uid'][0]} ${displayName.elementAt(1)}");
+      //TODO:部門角色未設定
+      emit(state.copyWith(
+          status: BlocStatus.success,
+          refreshTokenExisted: true,
+          accessTokenExisted: true,
+          employeePOJO: EmployeePOJO(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), [])));
     } else {
       Logger.login(
           className: "AuthenticationBloc", event: "_login", status: "ERROR", message: "get oauth token unsuccessful");
@@ -113,7 +122,16 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
         Logger.login(className: "AuthenticationBloc", event: "_ldapLogin", message: "verify LDAP successful");
         if (value) {
           Logger.debug(message: "verify LDAP successful");
-          emit(state.copyWith(status: BlocStatus.success, refreshTokenExisted: true, accessTokenExisted: true));
+          Map<String, dynamic> userInfo = await authenticationRepository.getTokenInfo();
+          List<String> displayName = userInfo['displayName'].toString().split(" ");
+          Logger.debug(
+              message: "Login user : ${displayName.elementAt(0)} ${userInfo['uid'][0]} ${displayName.elementAt(1)}");
+          //TODO:部門角色未設定
+          emit(state.copyWith(
+              status: BlocStatus.success,
+              refreshTokenExisted: true,
+              accessTokenExisted: true,
+              employeePOJO: EmployeePOJO(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), [])));
         } else {
           emit(state.copyWith(
               status: BlocStatus.failure,

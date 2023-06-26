@@ -50,7 +50,7 @@ class LoginScreen extends StatelessWidget {
                     /* 登入成功接續登入realm */
                     if (state.status == BlocStatus.success && state.refreshTokenExisted && state.accessTokenExisted) {
                       BlocProvider.of<RealmMgmtBloc>(context).add(RealmMgmtLoginRequested());
-                      BlocProvider.of<RealmMgmtBloc>(context).add(RealmMgmtUpdateSubscriptionsStarted());
+                      BlocProvider.of<RealmMgmtBloc>(context).add(RealmMgmtUpdateSubscriptionsStarted(employeePOJO: state.employeePOJO));
                     }
                     /* 錯誤 */
                     if (state.status == BlocStatus.failure) {

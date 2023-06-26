@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:mobile_poss_gp01/database_objects/realm/pojo/subscription_req.dart';
 import 'package:mobile_poss_gp01/repositories/repository.dart';
 import 'package:realm/realm.dart';
 
@@ -27,8 +28,8 @@ class RealmAuthorizedRepository extends RealmRepository {
     await realmSyncDao.userLogout();
   }
 
-  Future<void> updateSubscriptions() async {
-    await realmSyncDao.updateSubscriptions();
+  Future<void> updateSubscriptions(SubscriptionReq subscriptionReq) async {
+    await realmSyncDao.updateSubscriptions(subscriptionReq);
   }
 
   void bindConnectionStreamListen(callbackFun) {
