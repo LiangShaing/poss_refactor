@@ -108,33 +108,36 @@ class RealmSyncDao {
     }
 
     if (await isNetworkConnect() == false) {
-      _log("[userLogin] network not connect");
+      Logger.info(className: "RealmSyncDao", event: "userLogin", message: "network not connect");
       if (_app?.currentUser == null) {
         throw RealmDaoException("not find user");
       }
       _user = _app?.currentUser;
     } else {
-      _log("[userLogin] network is connect");
+      Logger.info(className: "RealmSyncDao", event: "userLogin", message: "network is connect");
       _user = await _app?.logIn(_credentials!);
     }
-    _log("[userLogin] finish, user: ${_user?.id}");
+    Logger.info(className: "RealmSyncDao", event: "userLogin", message: "finish user: ${_user?.id}");
+
     return _user;
   }
 
   Future<void> userLogout() async {
     await _user?.logOut();
     _user = null;
-    _log("userLogout finish");
+    Logger.info(className: "RealmSyncDao", event: "userLogout", message: "userLogout finish");
   }
 
   Future<void> createRealm() async {
-    _log("[createRealm] start");
+    Logger.info(className: "RealmSyncDao", event: "createRealm", message: "start");
+
     if (_app == null) {
       throw RealmDaoException("[createRealm] realm _app is null");
     } else if (_user == null) {
       throw RealmDaoException("[createRealm] realm _user is null");
     }
-    _log("[createRealm] path: ${Configuration.defaultRealmPath}");
+    Logger.info(className: "RealmSyncDao", event: "createRealm", message: "path: ${Configuration.defaultRealmPath}");
+
     Configuration config = Configuration.flexibleSync(_user!, [
       /* PersonalizedSettings */
       //TODO:個人化設定 單一登入還未實作
@@ -178,15 +181,19 @@ class RealmSyncDao {
       /* PaymentDevice */
       PaymentDevice.schema,
     ], syncErrorHandler: (SyncError error) {
-      _log("[createRealm][syncErrorHandler] Error message : ${error.message.toString()}");
+      Logger.error(className: "RealmSyncDao", event: "createRealm", message: "${error.message}");
     }, clientResetHandler: ManualRecoveryHandler((clientResetError) {
-      _log("[createRealm][clientResetHandler] clientResetError.isFatal : ${clientResetError.isFatal}");
+      Logger.error(
+          className: "RealmSyncDao",
+          event: "createRealm",
+          message: "clientResetError.isFatal : ${clientResetError.isFatal}");
       _realm?.close();
       clientResetError.resetRealm();
     }));
 
     _realm = Realm(config);
-    _log("[createRealm] finish, _realm.path: ${_realm?.config.path}");
+    Logger.info(
+        className: "RealmSyncDao", event: "createRealm", message: "finish, _realm.path: ${_realm?.config.path}");
   }
 
   Future<void> updateSubscriptions(SubscriptionReq subscriptionReq) async {
@@ -195,7 +202,7 @@ class RealmSyncDao {
     }
 
     if (await isNetworkConnect() == false) {
-      _log("[updateSubscriptions] not network.");
+      Logger.info(className: "RealmSyncDao", event: "updateSubscriptions", message: " not network.");
       return;
     }
 
@@ -217,7 +224,7 @@ class RealmSyncDao {
 
     final paymentMethodResults = realm.query<PaymentMethod>(r'departmentCode == $0', [departmentCode]);
 
-    final paymentDeviceResults= realm.query<PaymentDevice>(r'departmentCode == $0', [departmentCode]);
+    final paymentDeviceResults = realm.query<PaymentDevice>(r'departmentCode == $0', [departmentCode]);
 
     _realm?.subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.clear();
@@ -244,17 +251,13 @@ class RealmSyncDao {
   }
 
   static void deleteRealm(String path) {
-    _log("[deleteRealm] path: $path");
+    Logger.info(className: "RealmSyncDao", event: "deleteRealm", message: "path: $path");
     Realm.deleteRealm(path);
   }
 
   void closeRealm() {
     _realm?.close();
     _realm = null;
-    _log("closeRealm finish");
-  }
-
-  static void _log(String message) {
-    debugPrint(message);
+    Logger.info(className: "RealmSyncDao", event: "closeRealm", message: "finish");
   }
 }
