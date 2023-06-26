@@ -29,6 +29,9 @@ class RealmMgmtBloc extends AbstractBloc<RealmMgmtEvent, RealmMgmtState> {
       if (state.isLogin == true) {
         log("_realmLoginStarted is login");
         return;
+      } else if (event.employeePOJO == null) {
+        log("_realmUpdateSubscriptions is sync");
+        throw IllegalArgumentException("_realmUpdateSubscriptions employeePOJO is empty");
       }
 
       emit(const RealmMgmtLoadInProgress(
@@ -41,7 +44,8 @@ class RealmMgmtBloc extends AbstractBloc<RealmMgmtEvent, RealmMgmtState> {
       realmAuthorizedRepository.bindConnectionStreamListen(_connectionStream);
       realmAuthorizedRepository.bindUploadProgressStreamListen(_uploadProgressStream);
       realmAuthorizedRepository.bindDownloadProgressStreamListen(_downloadProgressStream);
-      emit(const RealmMgmtAuthenticatedSuccess(isLogin: true, isUpdateSubscriptions: false, isRealmConnect: false));
+      emit(RealmMgmtAuthenticatedSuccess(
+          isLogin: true, isUpdateSubscriptions: false, isRealmConnect: false, employeePOJO: event.employeePOJO));
     } catch (e) {
       log('RealmLoginBloc _realmLoginStarted : ${e.toString()}');
       emit(const RealmMgmtLoadFailure(isLogin: false, isUpdateSubscriptions: false, isRealmConnect: false));
@@ -93,17 +97,14 @@ class RealmMgmtBloc extends AbstractBloc<RealmMgmtEvent, RealmMgmtState> {
       final state = this.state;
       if (state.isLogin == false) {
         log("_realmUpdateSubscriptions not login");
-        return;
+        throw IllegalArgumentException("_realmUpdateSubscriptions not login");
       } else if (state.isUpdateSubscriptions == true) {
         log("_realmUpdateSubscriptions is sync");
         return;
-      } else if (event.employeePOJO == null) {
-        log("_realmUpdateSubscriptions is sync");
-        throw IllegalArgumentException("_realmUpdateSubscriptions employeePOJO is empty");
       }
 
       await realmAuthorizedRepository.updateSubscriptions(
-          SubscriptionReq(event.employeePOJO!.employeeId, event.employeePOJO!.defaultDepartmentCode));
+          SubscriptionReq(event.employeePOJO.employeeId, event.employeePOJO.defaultDepartmentCode));
 
       emit(const RealmMgmtSubscriptionsUpdatedSuccess(
         isLogin: true,

@@ -17,7 +17,7 @@ class StaticValues {
   static const List<String> symbols = ['♥', '♡', '&'];
 
   static List<MyBottomAppBarItem> bottomAppBarNavigation = [
-    MyBottomAppBarItem(
+    const MyBottomAppBarItem(
       0,
       i18nName: "QR code",
       icon: Icons.qr_code,
@@ -49,6 +49,8 @@ class StaticValues {
 
     ),
   ];
+
+  static const earmarkPurposeCode = "O2O";
 }
 
 class EngravingFontOption {

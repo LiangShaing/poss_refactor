@@ -49,8 +49,8 @@ class LoginScreen extends StatelessWidget {
                   listener: (context, state) {
                     /* 登入成功接續登入realm */
                     if (state.status == BlocStatus.success && state.refreshTokenExisted && state.accessTokenExisted) {
-                      BlocProvider.of<RealmMgmtBloc>(context).add(RealmMgmtLoginRequested());
-                      BlocProvider.of<RealmMgmtBloc>(context).add(RealmMgmtUpdateSubscriptionsStarted(employeePOJO: state.employeePOJO));
+                      BlocProvider.of<RealmMgmtBloc>(context)
+                          .add(RealmMgmtLoginRequested(employeePOJO: state.employeePOJO));
                     }
                     /* 錯誤 */
                     if (state.status == BlocStatus.failure) {
@@ -70,7 +70,12 @@ class LoginScreen extends StatelessWidget {
                 ),
                 BlocListener<RealmMgmtBloc, RealmMgmtState>(
                   listener: (context, state) {
-                    if (state.runtimeType == RealmMgmtAuthenticatedSuccess) {
+                    if (state.runtimeType == RealmMgmtAuthenticatedSuccess && state.employeePOJO != null) {
+                      BlocProvider.of<RealmMgmtBloc>(context)
+                          .add(RealmMgmtUpdateSubscriptionsStarted(employeePOJO: state.employeePOJO!));
+                    }
+
+                    if (state.runtimeType == RealmMgmtSubscriptionsUpdatedSuccess) {
                       BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginScreenLeaved());
                       SchedulerBinding.instance.addPostFrameCallback((_) {
                         MyNavigator.pushReset(BaseRoute.menuScreenRouteName);

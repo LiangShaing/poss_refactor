@@ -3,6 +3,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/model/realm_models.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/pojo/subscription_req.dart';
+import 'package:mobile_poss_gp01/resources/static_values.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:realm/realm.dart';
 
@@ -171,7 +172,11 @@ class RealmSyncDao {
       ModelReference.schema,
       ProductTitle.schema,
       /* Earmark */
-      Earmark.schema
+      Earmark.schema,
+      /* PaymentMethod */
+      PaymentMethod.schema,
+      /* PaymentDevice */
+      PaymentDevice.schema,
     ], syncErrorHandler: (SyncError error) {
       _log("[createRealm][syncErrorHandler] Error message : ${error.message.toString()}");
     }, clientResetHandler: ManualRecoveryHandler((clientResetError) {
@@ -194,23 +199,47 @@ class RealmSyncDao {
       return;
     }
 
+    String departmentCode = subscriptionReq.defaultDepartmentCode;
+    String employeeId = subscriptionReq.employeeId;
+
     final customerSessionResults = _realm?.query<CustomerSession>(
-        r'departmentCode == $0 AND employeeId==$1 AND checkInIndicator == $2',
-        [subscriptionReq.defaultDepartmentCode, subscriptionReq.employeeId, true]);
+        r'departmentCode == $0 AND employeeId==$1 AND checkInIndicator == $2', [departmentCode, employeeId, true]);
     Logger.debug(
         message:
-            "customerSessionResults query:[departmentCode == ${subscriptionReq.defaultDepartmentCode} AND employeeId==${subscriptionReq.employeeId} AND checkInIndicator == true]");
-    // final inventoryResults = realm.query<Inventory>(r'custodianDepartmentCode == $0', [_departmentCode]);
-    // final modelResults = realm.query<Model>(r"departmentCodes == $0", [_departmentCode]);
-    // final catalogItemResults = realm.query<CatalogItem>(r'departmentCodes == $0', [_departmentCode]);
+            "customerSessionResults query:[departmentCode == $departmentCode AND employeeId==$employeeId AND checkInIndicator == true]");
+    final inventoryResults = realm.query<Inventory>(r'custodianDepartmentCode == $0', [departmentCode]);
+    final modelResults = realm.query<Model>(r"departmentCodes == $0", [departmentCode]);
+    final catalogItemResults = realm.query<CatalogItem>(r'departmentCodes == $0', [departmentCode]);
+
+    final earmarkResults =
+        realm.query<Earmark>(r'tag ==[c] $0 AND purposeCode ==[c] $0', [StaticValues.earmarkPurposeCode]);
+    final shoppingBagResults = realm.query<ShoppingBag>(r'departmentCode == $0', [departmentCode]);
+
+    final paymentMethodResults = realm.query<PaymentMethod>(r'departmentCode == $0', [departmentCode]);
+
+    final paymentDeviceResults= realm.query<PaymentDevice>(r'departmentCode == $0', [departmentCode]);
 
     _realm?.subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.clear();
       mutableSubscriptions.add(customerSessionResults!);
       mutableSubscriptions.add(_realm!.all<GoldRate>());
+      mutableSubscriptions.add(inventoryResults);
+      mutableSubscriptions.add(modelResults);
+      mutableSubscriptions.add(catalogItemResults);
+      mutableSubscriptions.add(earmarkResults);
+      mutableSubscriptions.add(shoppingBagResults);
+      mutableSubscriptions.add(paymentMethodResults);
+      mutableSubscriptions.add(paymentDeviceResults);
     });
 
     debugPrint("customerSessionResults.length ==================== ${customerSessionResults?.length}");
+    debugPrint("CatalogItem ===================== ${catalogItemResults.length}");
+    debugPrint("Model ===================== ${modelResults.length}");
+    debugPrint("Inventory ===================== ${inventoryResults.length}");
+    debugPrint("PaymentMethod =====================${paymentMethodResults.length}");
+    debugPrint("PaymentDevice =====================${paymentDeviceResults.length}");
+    debugPrint("Earmark =====================${earmarkResults.length}");
+    debugPrint("ShoppingBag =====================${shoppingBagResults.length}");
     await _realm?.subscriptions.waitForSynchronization();
   }
 
