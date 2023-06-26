@@ -26,8 +26,7 @@ class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSes
   }
 
   Future<void> _createCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
-    //todo use repository
-    //todo emit here
+    Logger.info(className: "CustomerSessionBloc", event: "_createCustomerSession", message: "started");
     /* 當前已有會客序號: 關閉當前會客 */
     emit(CustomerSessionLoadInProgress());
     final DateTime now = DateTime.now();
@@ -36,27 +35,17 @@ class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSes
     CustomerSession customerSession = CustomerSession(ObjectId(), true, DateTime.now().toUtc(), "689", "221470", "梁小翔",
         code: "221470-$formatted", currentProgress: "SELLING");
     await customerSessionRepository.createCustomerSession(customerSession);
-    CustomerSession? currentCustomerSession = customerSessionRepository.currentCustomerSession;
     add(CustomerSessionInitialed());
-  }
-
-  Future<void> _searchCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
-    log("_searchCustomerSession");
-    emit(CustomerSessionLoadInProgress());
-    CustomerSession? currentCustomerSession = customerSessionRepository.currentCustomerSession;
-    log("_searchCustomerSession [${currentCustomerSession?.id}]");
-    if (currentCustomerSession == null) {
-      emit(CustomerSessionLoadInitial());
-    } else {
-      emit(CustomerSessionLoadSuccess(customerSession: currentCustomerSession));
-    }
   }
 
   Future<void> _initialCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
     Logger.info(className: "CustomerSessionBloc", event: "_initialCustomerSession", message: "started");
     emit(CustomerSessionLoadInProgress());
     CustomerSession? currentCustomerSession = customerSessionRepository.currentCustomerSession;
-    log("_searchCustomerSession [${currentCustomerSession?.id}]");
+    Logger.info(
+        className: "CustomerSessionBloc",
+        event: "_initialCustomerSession",
+        message: "currentCustomerSession [${currentCustomerSession?.id}]");
     if (currentCustomerSession == null) {
       emit(CustomerSessionLoadInitial());
     } else {
