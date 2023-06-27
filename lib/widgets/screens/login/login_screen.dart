@@ -29,89 +29,87 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    return BlocProvider(
-        create: (BuildContext context) => AuthenticationBloc(authenticationRepository: AuthenticationRepository())
-          ..add(AuthenticationInitialed(isAutoLogin: args.isAutoLogin)),
-        child: WillPopScope(
-            onWillPop: () async {
-              return true;
-            },
-            child: MultiBlocListener(
-              listeners: [
-                BlocListener<AppMgmtBloc, AppMgmtState>(listener: (context, state) {
-                  if (state.runtimeType == AppMgmtDeepLinkCodeLoadSuccess) {
-                    AppMgmtDeepLinkCodeLoadSuccess e = state as AppMgmtDeepLinkCodeLoadSuccess;
-                    Logger.debug(message: "AppInitBloc AppInitDeepLinkCodeLoadSuccess [${e.code}]");
-                    BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginRequested(code: e.code));
-                  }
-                }),
-                BlocListener<AuthenticationBloc, AuthenticationState>(
-                  listener: (context, state) {
-                    /* 登入成功接續登入realm */
-                    if (state.status == BlocStatus.success && state.refreshTokenExisted && state.accessTokenExisted) {
-                      BlocProvider.of<RealmMgmtBloc>(context)
-                          .add(RealmMgmtLoginRequested(employeePOJO: state.employeePOJO));
-                    }
-                    /* 錯誤 */
-                    if (state.status == BlocStatus.failure) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        backgroundColor: ColorStyle.warningRed.withOpacity(0.6),
-                        duration: const Duration(milliseconds: 3000),
-                        margin: EdgeInsets.only(
-                          left: MediaQuery.of(context).size.width * 0.3,
-                          right: MediaQuery.of(context).size.width * 0.3,
-                          bottom: MediaQuery.of(context).size.height - 100,
-                        ),
-                        content: Center(child: Text(state.error)),
-                      ));
-                    }
-                  },
-                ),
-                BlocListener<RealmMgmtBloc, RealmMgmtState>(
-                  listener: (context, state) {
-                    if (state.runtimeType == RealmMgmtAuthenticatedSuccess && state.employeePOJO != null) {
-                      BlocProvider.of<RealmMgmtBloc>(context)
-                          .add(RealmMgmtUpdateSubscriptionsStarted(employeePOJO: state.employeePOJO!));
-                    }
+    // context.read<AuthenticationBloc>().add(AuthenticationInitialed(isAutoLogin:args.isAutoLogin));
+    return WillPopScope(
+        onWillPop: () async {
+          return true;
+        },
+        child: MultiBlocListener(
+          listeners: [
+            BlocListener<AppMgmtBloc, AppMgmtState>(listener: (context, state) {
+              if (state.runtimeType == AppMgmtDeepLinkCodeLoadSuccess) {
+                AppMgmtDeepLinkCodeLoadSuccess e = state as AppMgmtDeepLinkCodeLoadSuccess;
+                Logger.debug(message: "AppInitBloc AppInitDeepLinkCodeLoadSuccess [${e.code}]");
+                BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginRequested(code: e.code));
+              }
+            }),
+            BlocListener<AuthenticationBloc, AuthenticationState>(
+              listener: (context, state) {
+                /* 登入成功接續登入realm */
+                if (state.status == BlocStatus.success && state.refreshTokenExisted && state.accessTokenExisted) {
+                  BlocProvider.of<RealmMgmtBloc>(context)
+                      .add(RealmMgmtLoginRequested(employeePOJO: state.employeePOJO));
+                }
+                /* 錯誤 */
+                if (state.status == BlocStatus.failure) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: ColorStyle.warningRed.withOpacity(0.6),
+                    duration: const Duration(milliseconds: 3000),
+                    margin: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width * 0.3,
+                      right: MediaQuery.of(context).size.width * 0.3,
+                      bottom: MediaQuery.of(context).size.height - 100,
+                    ),
+                    content: Center(child: Text(state.error)),
+                  ));
+                }
+              },
+            ),
+            BlocListener<RealmMgmtBloc, RealmMgmtState>(
+              listener: (context, state) {
+                if (state.runtimeType == RealmMgmtAuthenticatedSuccess && state.employeePOJO != null) {
+                  BlocProvider.of<RealmMgmtBloc>(context)
+                      .add(RealmMgmtUpdateSubscriptionsStarted(employeePOJO: state.employeePOJO!));
+                }
 
-                    if (state.runtimeType == RealmMgmtSubscriptionsUpdatedSuccess) {
-                      BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginScreenLeaved());
-                      SchedulerBinding.instance.addPostFrameCallback((_) {
-                        MyNavigator.pushReset(BaseRoute.menuScreenRouteName);
-                      });
-                    }
-                  },
-                ),
-              ],
-              child: Scaffold(
-                body: Column(
-                  children: [
-                    BlocBuilder<RealmMgmtBloc, RealmMgmtState>(builder: (BuildContext context, RealmMgmtState state) {
-                      return state.runtimeType == RealmMgmtLoadInProgress
-                          ? const MyLinearProgressIndicator()
-                          : Container();
-                    }),
-                    Expanded(
-                        child: Image(
+                if (state.runtimeType == RealmMgmtSubscriptionsUpdatedSuccess) {
+                  BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginScreenLeaved());
+                  SchedulerBinding.instance.addPostFrameCallback((_) {
+                    MyNavigator.pushReset(BaseRoute.menuScreenRouteName);
+                  });
+                }
+              },
+            ),
+          ],
+          child: Scaffold(
+            body: Column(
+              children: [
+                BlocBuilder<RealmMgmtBloc, RealmMgmtState>(builder: (BuildContext context, RealmMgmtState state) {
+                  return state.runtimeType == RealmMgmtLoadInProgress
+                      ? const MyLinearProgressIndicator()
+                      : Container();
+                }),
+                Expanded(
+                    child: Image(
                       image: const AssetImage('assets/images/CSS_logo.png'),
                       height: height * 0.3,
                     )),
-                    BlocBuilder<AuthenticationBloc, AuthenticationState>(builder: _builder),
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 10, left: 16),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          String.fromEnvironment("VERSION", defaultValue: ""),
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
+                BlocBuilder<AuthenticationBloc, AuthenticationState>(builder: _builder),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 10, left: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      String.fromEnvironment("VERSION", defaultValue: ""),
+                      textAlign: TextAlign.left,
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            )));
+              ],
+            ),
+          ),
+        ));
   }
 
   Widget _builder(BuildContext context, AuthenticationState state) {

@@ -1,4 +1,3 @@
-import 'package:mobile_poss_gp01/database_objects/user/pojo/employee_pojo.dart';
 
 abstract class CustomerSessionEvent {}
 

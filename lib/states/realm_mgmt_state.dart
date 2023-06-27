@@ -69,3 +69,7 @@ class RealmMgmtSubscriptionsUpdatedSuccess extends RealmMgmtState {
   @override
   List<Object> get props => [];
 }
+
+class RealmMgmtLogoutSuccess extends RealmMgmtState {
+  const RealmMgmtLogoutSuccess({required super.isLogin, required super.isUpdateSubscriptions, required super.isRealmConnect});
+}

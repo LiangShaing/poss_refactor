@@ -59,13 +59,14 @@ class AppMgmtBloc extends AbstractBloc<AppMgmtEvent, AppMgmtState> {
   /// 初始化deep link function
   void _initHandleDeepLink() {
     Logger.info(className: "AppMgmtBloc", event: "_initHandleDeepLink", message: "started");
-    FlutterDeepLink.streamDeepLinkResult?.listen((deepLink) {
-      String code = _urlParser(deepLink);
-      if (code.isNotEmpty) {
-        Logger.debug(className: "AppMgmtBloc", message: "_initHandleDeepLink code[$code]");
-        add(AppMgmtOauthCodeReturned(code: code));
-      }
-    });
+      FlutterDeepLink.streamDeepLinkResult?.listen((deepLink) {
+        String code = _urlParser(deepLink);
+        if (code.isNotEmpty) {
+          Logger.debug(className: "AppMgmtBloc", message: "_initHandleDeepLink code[$code]");
+          add(AppMgmtOauthCodeReturned(code: code));
+        }
+      });
+
   }
 
   /// Oauth登入完成後執行

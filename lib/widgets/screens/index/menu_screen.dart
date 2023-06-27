@@ -275,6 +275,7 @@ class MenuScreen extends StatelessWidget with CommonFunction {
               child: Row(
                 children: [
                   /* 功能選項 */
+                  Text(context.read<AuthenticationBloc>().state.employeePOJO?.employeeId ??"123"),
                   MyTextStatelessWidget(
                     padding: const EdgeInsets.all(8.0),
                     text: "menu.title.menu".tr,

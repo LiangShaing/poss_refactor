@@ -8,6 +8,7 @@ import 'package:mobile_poss_gp01/blocs/authentication_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/gold_rate_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/realm_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/enum/bloc_status.dart';
+import 'package:mobile_poss_gp01/events/authentication_event.dart';
 import 'package:mobile_poss_gp01/events/localization_event.dart';
 import 'package:mobile_poss_gp01/i18n/localizations.dart';
 import 'package:mobile_poss_gp01/observers/global_bloc_observer.dart';
@@ -52,11 +53,10 @@ class MyApp extends StatelessWidget {
             create: (BuildContext context) => RealmMgmtBloc(realmAuthorizedRepository: RealmAuthorizedRepository()),
           ),
           BlocProvider<AuthenticationBloc>(
-              create: (BuildContext context) =>
-                  AuthenticationBloc(authenticationRepository: AuthenticationRepository())),
+              create: (BuildContext context) => AuthenticationBloc(authenticationRepository: AuthenticationRepository())
+                ..add(AuthenticationInitialed(isAutoLogin: true))),
           BlocProvider<GoldRateBloc>(
-              create: (BuildContext context) =>
-                  GoldRateBloc(goldRateRepository: GoldRateRepository()))
+              create: (BuildContext context) => GoldRateBloc(goldRateRepository: GoldRateRepository()))
         ],
         child: BlocBuilder<AppMgmtBloc, AppMgmtState>(builder: (context, state) {
           Widget widget;

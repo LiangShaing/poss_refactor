@@ -48,3 +48,5 @@ class AuthenticationState extends Equatable {
     );
   }
 }
+
+class AuthenticationLogoutSuccess extends AuthenticationState {}

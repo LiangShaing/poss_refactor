@@ -167,8 +167,8 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
   Future<void> _logout(AuthenticationEvent event, Emitter<AuthenticationState> emit) async {
     Logger.login(className: "AuthenticationBloc", event: "_logout", message: "started");
     await authenticationRepository.cleanOauth();
+    emit(AuthenticationLogoutSuccess());
     await _logoutOpenBrowser();
-    emit(const AuthenticationState());
   }
 
   ///Android打開瀏覽器
