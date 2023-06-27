@@ -174,7 +174,6 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
   ///Android打開瀏覽器
   Future<void> _openBrowser() async {
     Logger.login(className: "AuthenticationBloc", event: "_openBrowser", message: "started");
-    // NewRelicPlugin.loginRecord(className: "LoginPage", message: "_openBrowser");
     //取得oauth 路徑
     String url = await authenticationRepository.getOauthURL();
     try {
