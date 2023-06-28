@@ -6,15 +6,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/app_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/authentication_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/customer_session_bloc.dart';
+import 'package:mobile_poss_gp01/blocs/product_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/realm_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/enum/bloc_status.dart';
 import 'package:mobile_poss_gp01/events/app_mgmt_event.dart';
 import 'package:mobile_poss_gp01/events/authentication_event.dart';
 import 'package:mobile_poss_gp01/events/customer_session_event.dart';
+import 'package:mobile_poss_gp01/events/product_event.dart';
 import 'package:mobile_poss_gp01/events/realm_mgmt_event.dart';
 import 'package:mobile_poss_gp01/extension/string_extension.dart';
 import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
+import 'package:mobile_poss_gp01/repositories/product_repository.dart';
 import 'package:mobile_poss_gp01/resources/color_style.dart';
 import 'package:mobile_poss_gp01/resources/size_style.dart';
 import 'package:mobile_poss_gp01/routes/base/arguments/login_screen_route_arguments.dart';
@@ -23,6 +26,7 @@ import 'package:mobile_poss_gp01/routes/my_navigator.dart';
 import 'package:mobile_poss_gp01/states/app_mgmt_state.dart';
 import 'package:mobile_poss_gp01/states/authentication_state.dart';
 import 'package:mobile_poss_gp01/states/customer_session_state.dart';
+import 'package:mobile_poss_gp01/states/product_state.dart';
 import 'package:mobile_poss_gp01/states/realm_mgmt_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_text_stateless_widget.dart';
@@ -113,7 +117,7 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
   //   }
   // }
 
-  // static final TextEditingController _searchController = TextEditingController();
+  static final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +129,6 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
               if (state.runtimeType == RealmMgmtLogoutSuccess) {
                 BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLogoutRequested());
               }
-
             },
           ),
           BlocListener<AuthenticationBloc, AuthenticationState>(
@@ -164,43 +167,68 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
                       return widget;
                     }),
                     /* 搜尋商品輸入欄 */
-                    Container(
-                      width: 200,
-                      height: SizeStyle.buttonHeightMedium,
-                      margin: const EdgeInsets.only(left: SizeStyle.paddingUnit),
-                      child: TextField(
-                        // controller: _searchController,
-                        maxLines: 1,
-                        style: const TextStyle(fontSize: 17),
-                        textAlignVertical: TextAlignVertical.center,
-                        onSubmitted: (String value) {},
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color.fromRGBO(252, 252, 252, 1),
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
-                            onPressed: () => null,
-                          ),
-                          border: const OutlineInputBorder(
-                              borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(30))),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: SizeStyle.paddingUnit * 2),
-                        ),
-                        // onSubmitted: (String value) => value.isNotEmpty ? _showAddToCartDialog(value, context) : null,
-                        // decoration: InputDecoration(
-                        //   filled: true,
-                        //   fillColor: const Color.fromRGBO(252, 252, 252, 1),
-                        //   suffixIcon: IconButton(
-                        //     icon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
-                        //     onPressed: () => _searchController.text.isNotEmpty
-                        //         ? _showAddToCartDialog(_searchController.text, context)
-                        //         : null,
-                        //   ),
-                        //   border: const OutlineInputBorder(
-                        //       borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(30))),
-                        //   contentPadding: const EdgeInsets.symmetric(horizontal: SizeStyle.paddingUnit * 2),
-                        // ),
-                      ),
-                    )
+                    BlocProvider<ProductBloc>(
+                        create: (BuildContext context) => ProductBloc(productRepository: ProductRepository()),
+                        child: BlocListener<ProductBloc, ProductState>(
+                          listener: (context, state) {
+                            /* 登出成功導向首頁 */
+                            if (state.runtimeType == ProductLoadFailure) {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: ColorStyle.warningRed.withOpacity(0.6),
+                                duration: const Duration(milliseconds: 3000),
+                                margin: EdgeInsets.only(
+                                  left: MediaQuery.of(context).size.width * 0.3,
+                                  right: MediaQuery.of(context).size.width * 0.3,
+                                ),
+                                content: Center(child: Text((state as ProductLoadFailure).errorMessage)),
+                              ));
+                            }
+                          },
+                          child: BlocBuilder<ProductBloc, ProductState>(
+                              builder: (BuildContext context, ProductState state) {
+                            return Container(
+                              width: 200,
+                              height: SizeStyle.buttonHeightMedium,
+                              margin: const EdgeInsets.only(left: SizeStyle.paddingUnit),
+                              child: TextField(
+                                controller: _searchController,
+                                maxLines: 1,
+                                style: const TextStyle(fontSize: 17),
+                                textAlignVertical: TextAlignVertical.center,
+                                onSubmitted: (String value) =>
+                                    context.read<ProductBloc>().add(ProductItemFetched(value: value)),
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: const Color.fromRGBO(252, 252, 252, 1),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
+                                    onPressed: () => context
+                                        .read<ProductBloc>()
+                                        .add(ProductItemFetched(value: _searchController.text)),
+                                  ),
+                                  border: const OutlineInputBorder(
+                                      borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(30))),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: SizeStyle.paddingUnit * 2),
+                                ),
+                                // onSubmitted: (String value) => value.isNotEmpty ? _showAddToCartDialog(value, context) : null,
+                                // decoration: InputDecoration(
+                                //   filled: true,
+                                //   fillColor: const Color.fromRGBO(252, 252, 252, 1),
+                                //   suffixIcon: IconButton(
+                                //     icon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
+                                //     onPressed: () => _searchController.text.isNotEmpty
+                                //         ? _showAddToCartDialog(_searchController.text, context)
+                                //         : null,
+                                //   ),
+                                //   border: const OutlineInputBorder(
+                                //       borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(30))),
+                                //   contentPadding: const EdgeInsets.symmetric(horizontal: SizeStyle.paddingUnit * 2),
+                                // ),
+                              ),
+                            );
+                          }),
+                        )),
 
                     // StreamBuilder<RealmResultsChanges<CustomerSession>>(
                     //   stream: IndexPageState.customerService.getCurrentCustomerSession()?.changes,

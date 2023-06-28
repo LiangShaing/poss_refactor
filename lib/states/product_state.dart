@@ -1,5 +1,3 @@
-
-
 import 'package:equatable/equatable.dart';
 
 abstract class ProductState<T> extends Equatable {
@@ -17,6 +15,10 @@ class ProductLoadInitial extends ProductState {
 }
 
 class ProductLoadFailure extends ProductState {
+  const ProductLoadFailure(this.errorMessage);
+
+  final String errorMessage;
+
   @override
-  List<Object> get props => [];
+  List<Object> get props => [errorMessage];
 }
