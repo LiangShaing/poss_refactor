@@ -52,15 +52,15 @@ class MenuScreen extends StatelessWidget with CommonFunction {
       if (value.isNotEmpty) value.sort((a, b) => b.effectiveDate.compareTo(a.effectiveDate));
     });
 
-    List<Map<String, String>> tableData = [
+    List<Map<String, String>>  tableData = [
       {
         'name': 'menu.label.pureGoldJewelry'.tr,
         'price1': _removeTrailingZeroes(groups['001']?.firstOrNull?.rate),
-        'price2': _removeTrailingZeroes(groups['007']?.firstOrNull?.rate),
-        'price3': _removeTrailingZeroes(groups['008']?.firstOrNull?.rate)
+        'price2': '--',
+        'price3': _removeTrailingZeroes(groups['007']?.firstOrNull?.rate)
       },
       {
-        'name': 'menu.label.goldBuckle'.tr,
+        'name': 'menu.label.sequins'.tr,
         'price1': _removeTrailingZeroes(groups['005']?.firstOrNull?.rate),
         'price2': '--',
         'price3': '--'
@@ -71,11 +71,18 @@ class MenuScreen extends StatelessWidget with CommonFunction {
         'price2': '--',
         'price3': '--'
       },
+      {'name': 'menu.label.goldBars'.tr, 'price1': "--", 'price2': "--", 'price3': "--"},
       {
         'name': 'menu.label.platinumJewelry'.tr,
+        'price1': "--",
+        'price2': "--",
+        'price3': "--"
+      },
+      {
+        'name': 'menu.label.950platinumJewelry'.tr,
         'price1': _removeTrailingZeroes(groups['002']?.firstOrNull?.rate),
-        'price2': _removeTrailingZeroes(groups['009']?.firstOrNull?.rate),
-        'price3': '--'
+        'price2': '--',
+        'price3': _removeTrailingZeroes(groups['009']?.firstOrNull?.rate)
       },
     ];
 
@@ -192,68 +199,6 @@ class MenuScreen extends StatelessWidget with CommonFunction {
 
   @override
   Widget build(BuildContext context) {
-    List<dynamic> features = [
-      {
-        'name': "menu.label.sale".tr,
-        'features': [
-          {
-            'name': 'menu.button.startSession'.tr,
-            'icon': Icons.group_add.codePoint,
-            'disabled': false,
-            'func': () async {
-              // BlocProvider.of<CustomerSessionBloc>(context).add(CustomerSessionStarted());
-              // BlocProvider.of<CustomerSessionBloc>(context).state;
-              // BlocProvider.of<CustomerSessionBloc>(context).add(CustomerSessionStarted());
-              // if (IndexPageState.customerService.getCurrentCustomerSession()?.isNotEmpty == true) {
-              //   /* 當前已有會客序號: 關閉當前會客 */
-              //   bool _isConfirm = await showAlertWithResp(context, "widget.appbar.label.closeCustomerSession".tr,
-              //       titleAlignment: TextAlign.center) ??
-              //       false;
-              //   if (!_isConfirm) return;
-              //   await IndexPageState.customerService.stopOrCloseCustomerSession();
-              // }
-              //
-              // IndexPageState.customerService.createNewCustomerSession();
-              // showSuccessSnackBar(context, "menu.message.alreadyCreatedCustomerSession".tr);
-              // final AppProvider _appProvider = context.read<AppProvider>();
-              // _appProvider.closeDrawer();
-              // _appProvider.setBottomIndex(3);
-              // MyNavigationPossService.pushReset(PossMobileRoute.cartPageRouteName);
-            }
-          },
-          {'name': "menu.button.myCard".tr, 'icon': 0xe18a, 'disabled': true, 'func': () {}}
-        ]
-      },
-      {
-        'name': "menu.label.transaction".tr,
-        'features': [
-          {'name': "menu.button.viewItems".tr, 'icon': 0xe33e, 'disabled': true, 'func': () {}},
-          {'name': "menu.button.jewelryPurchase".tr, 'icon': 0xf04ed, 'disabled': true, 'func': () {}}
-        ]
-      },
-      // {
-      //   'name': "menu.label.afterSaleService".tr,
-      //   'features': [
-      //     {'name': "menu.button.pickUp".tr, 'icon': 0xe13e, 'disabled': false},
-      //     {'name': "menu.button.customerRepair".tr, 'icon': 0xe189, 'disabled': false},
-      //     {'name': "menu.button.specialReturns".tr, 'icon': 0xe0a8, 'disabled': false},
-      //     {'name': "menu.button.cancelDeal".tr, 'icon': 0xe139, 'disabled': false},
-      //     {'name': "menu.button.addOrder".tr, 'icon': 0xe0b2, 'disabled': false}
-      //   ]
-      // },
-      // {
-      //   'name': "menu.label.customized".tr,
-      //   'features': [
-      //     {'name': "menu.button.diamondJewelry".tr, 'icon': 0xe08c, 'disabled': true},
-      //     {'name': "menu.button.customRings".tr, 'icon': 0xe08c, 'disabled': false},
-      //     {'name': "menu.button.weddingOrder".tr, 'icon': 0xe08c, 'disabled': false},
-      //     {'name': "menu.button.spotSales".tr, 'icon': 0xf04f6, 'disabled': false},
-      //   ]
-      // },
-    ];
-    // ///銷售 & 購入交易
-    // List<_GroupFeaturePojo> data = features.getRange(0, 2).map((e) => _GroupFeaturePojo.fromJson(e)).toList();
-
     return MultiBlocProvider(
         providers: [
           BlocProvider<CustomerSessionBloc>(

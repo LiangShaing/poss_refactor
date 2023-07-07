@@ -55,8 +55,6 @@ class MyApp extends StatelessWidget {
           BlocProvider<AuthenticationBloc>(
               create: (BuildContext context) => AuthenticationBloc(authenticationRepository: AuthenticationRepository())
                 ..add(AuthenticationInitialed(isAutoLogin: true))),
-          BlocProvider<GoldRateBloc>(
-              create: (BuildContext context) => GoldRateBloc(goldRateRepository: GoldRateRepository()))
         ],
         child: BlocBuilder<AppMgmtBloc, AppMgmtState>(builder: (context, state) {
           Widget widget;
