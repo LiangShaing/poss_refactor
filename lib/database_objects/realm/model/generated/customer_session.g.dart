@@ -20,6 +20,7 @@ class CustomerSession extends _CustomerSession
     String? currentProgress,
     String? code,
     DateTime? endedDate,
+    String? customerId,
     String? customerName,
     UIPersistShoppingBag? uiPersistShoppingBag,
     Iterable<BrowsingHistories> browsingHistories = const [],
@@ -35,6 +36,7 @@ class CustomerSession extends _CustomerSession
     RealmObjectBase.set(this, 'employeeId', employeeId);
     RealmObjectBase.set(this, 'employeeName', employeeName);
     RealmObjectBase.set(this, 'endedDate', endedDate);
+    RealmObjectBase.set(this, 'customerId', customerId);
     RealmObjectBase.set(this, 'customerName', customerName);
     RealmObjectBase.set(this, 'uiPersistShoppingBag', uiPersistShoppingBag);
     RealmObjectBase.set<RealmList<BrowsingHistories>>(this, 'browsingHistories',
@@ -117,6 +119,13 @@ class CustomerSession extends _CustomerSession
       RealmObjectBase.set(this, 'endedDate', value);
 
   @override
+  String? get customerId =>
+      RealmObjectBase.get<String>(this, 'customerId') as String?;
+  @override
+  set customerId(String? value) =>
+      RealmObjectBase.set(this, 'customerId', value);
+
+  @override
   String? get customerName =>
       RealmObjectBase.get<String>(this, 'customerName') as String?;
   @override
@@ -168,6 +177,7 @@ class CustomerSession extends _CustomerSession
       SchemaProperty('employeeId', RealmPropertyType.string),
       SchemaProperty('employeeName', RealmPropertyType.string),
       SchemaProperty('endedDate', RealmPropertyType.timestamp, optional: true),
+      SchemaProperty('customerId', RealmPropertyType.string, optional: true),
       SchemaProperty('customerName', RealmPropertyType.string, optional: true),
       SchemaProperty('browsingHistories', RealmPropertyType.object,
           linkTarget: 'BrowsingHistories',
@@ -191,6 +201,7 @@ class ShoppingBag extends _ShoppingBag
     String? customerId,
     String? departmentCode,
     Iterable<ShoppingBagItem> items = const [],
+    Iterable<String> couponCodes = const [],
   }) {
     RealmObjectBase.set(this, '_id', id);
     RealmObjectBase.set(this, 'createdDate', createdDate);
@@ -204,6 +215,8 @@ class ShoppingBag extends _ShoppingBag
     RealmObjectBase.set(this, 'departmentCode', departmentCode);
     RealmObjectBase.set<RealmList<ShoppingBagItem>>(
         this, 'items', RealmList<ShoppingBagItem>(items));
+    RealmObjectBase.set<RealmList<String>>(
+        this, 'couponCodes', RealmList<String>(couponCodes));
   }
 
   ShoppingBag._();
@@ -275,6 +288,13 @@ class ShoppingBag extends _ShoppingBag
       throw RealmUnsupportedSetError();
 
   @override
+  RealmList<String> get couponCodes =>
+      RealmObjectBase.get<String>(this, 'couponCodes') as RealmList<String>;
+  @override
+  set couponCodes(covariant RealmList<String> value) =>
+      throw RealmUnsupportedSetError();
+
+  @override
   Stream<RealmObjectChanges<ShoppingBag>> get changes =>
       RealmObjectBase.getChanges<ShoppingBag>(this);
 
@@ -304,6 +324,8 @@ class ShoppingBag extends _ShoppingBag
       SchemaProperty('items', RealmPropertyType.object,
           linkTarget: 'ShoppingBagItem',
           collectionType: RealmCollectionType.list),
+      SchemaProperty('couponCodes', RealmPropertyType.string,
+          collectionType: RealmCollectionType.list),
     ]);
   }
 }
@@ -324,6 +346,7 @@ class ShoppingBagItem extends _ShoppingBagItem
     DateTime? lastModifiedDate,
     double? netAmount,
     double? laborCost,
+    String? status,
   }) {
     RealmObjectBase.set(this, 'id', id);
     RealmObjectBase.set(
@@ -339,6 +362,7 @@ class ShoppingBagItem extends _ShoppingBagItem
     RealmObjectBase.set(this, 'lastModifiedDate', lastModifiedDate);
     RealmObjectBase.set(this, 'netAmount', netAmount);
     RealmObjectBase.set(this, 'laborCost', laborCost);
+    RealmObjectBase.set(this, 'status', status);
   }
 
   ShoppingBagItem._();
@@ -429,6 +453,11 @@ class ShoppingBagItem extends _ShoppingBagItem
   set laborCost(double? value) => RealmObjectBase.set(this, 'laborCost', value);
 
   @override
+  String? get status => RealmObjectBase.get<String>(this, 'status') as String?;
+  @override
+  set status(String? value) => RealmObjectBase.set(this, 'status', value);
+
+  @override
   Stream<RealmObjectChanges<ShoppingBagItem>> get changes =>
       RealmObjectBase.getChanges<ShoppingBagItem>(this);
 
@@ -459,6 +488,7 @@ class ShoppingBagItem extends _ShoppingBagItem
           optional: true),
       SchemaProperty('netAmount', RealmPropertyType.double, optional: true),
       SchemaProperty('laborCost', RealmPropertyType.double, optional: true),
+      SchemaProperty('status', RealmPropertyType.string, optional: true),
     ]);
   }
 }
@@ -579,6 +609,7 @@ class CacheProductItem extends _CacheProductItem
     String? itemNumber,
     double? netAmount,
     double? inventoryAmount,
+    String? productOption,
     ProductDiscount? selectedProductDiscount,
     int? lineNumber,
     String? saleType,
@@ -600,6 +631,7 @@ class CacheProductItem extends _CacheProductItem
     RealmObjectBase.set(this, 'createdDate', createdDate);
     RealmObjectBase.set(this, 'netAmount', netAmount);
     RealmObjectBase.set(this, 'inventoryAmount', inventoryAmount);
+    RealmObjectBase.set(this, 'productOption', productOption);
     RealmObjectBase.set(
         this, 'selectedProductDiscount', selectedProductDiscount);
     RealmObjectBase.set(this, 'lineNumber', lineNumber);
@@ -672,6 +704,13 @@ class CacheProductItem extends _CacheProductItem
   @override
   set inventoryAmount(double? value) =>
       RealmObjectBase.set(this, 'inventoryAmount', value);
+
+  @override
+  String? get productOption =>
+      RealmObjectBase.get<String>(this, 'productOption') as String?;
+  @override
+  set productOption(String? value) =>
+      RealmObjectBase.set(this, 'productOption', value);
 
   @override
   RealmList<ProductDiscount> get discounts =>
@@ -782,6 +821,7 @@ class CacheProductItem extends _CacheProductItem
       SchemaProperty('netAmount', RealmPropertyType.double, optional: true),
       SchemaProperty('inventoryAmount', RealmPropertyType.double,
           optional: true),
+      SchemaProperty('productOption', RealmPropertyType.string, optional: true),
       SchemaProperty('discounts', RealmPropertyType.object,
           linkTarget: 'ProductDiscount',
           collectionType: RealmCollectionType.list),
@@ -1217,6 +1257,182 @@ class BookingUnitsCbu extends _BookingUnitsCbu
       SchemaProperty('inventoryId', RealmPropertyType.string, optional: true),
       SchemaProperty('modelSequenceNumber', RealmPropertyType.double,
           optional: true),
+    ]);
+  }
+}
+
+class ECoupon extends _ECoupon with RealmEntity, RealmObjectBase, RealmObject {
+  ECoupon(
+    ObjectId id,
+    String serialNumber, {
+    String? projectCode,
+    String? projectLineId,
+    String? ecouponType,
+    DateTime? issueDate,
+    String? issueInternalApp,
+    DateTime? effectiveFromDate,
+    DateTime? effectiveToDate,
+    String? staffId,
+    String? applicationCustomerId,
+    DateTime? createdDate,
+    DateTime? lastModifiedDate,
+    DateTime? usedDate,
+    String? referenceId,
+  }) {
+    RealmObjectBase.set(this, '_id', id);
+    RealmObjectBase.set(this, 'projectCode', projectCode);
+    RealmObjectBase.set(this, 'projectLineId', projectLineId);
+    RealmObjectBase.set(this, 'serialNumber', serialNumber);
+    RealmObjectBase.set(this, 'ecouponType', ecouponType);
+    RealmObjectBase.set(this, 'issueDate', issueDate);
+    RealmObjectBase.set(this, 'issueInternalApp', issueInternalApp);
+    RealmObjectBase.set(this, 'effectiveFromDate', effectiveFromDate);
+    RealmObjectBase.set(this, 'effectiveToDate', effectiveToDate);
+    RealmObjectBase.set(this, 'staffId', staffId);
+    RealmObjectBase.set(this, 'applicationCustomerId', applicationCustomerId);
+    RealmObjectBase.set(this, 'createdDate', createdDate);
+    RealmObjectBase.set(this, 'lastModifiedDate', lastModifiedDate);
+    RealmObjectBase.set(this, 'usedDate', usedDate);
+    RealmObjectBase.set(this, 'referenceId', referenceId);
+  }
+
+  ECoupon._();
+
+  @override
+  ObjectId get id => RealmObjectBase.get<ObjectId>(this, '_id') as ObjectId;
+  @override
+  set id(ObjectId value) => RealmObjectBase.set(this, '_id', value);
+
+  @override
+  String? get projectCode =>
+      RealmObjectBase.get<String>(this, 'projectCode') as String?;
+  @override
+  set projectCode(String? value) =>
+      RealmObjectBase.set(this, 'projectCode', value);
+
+  @override
+  String? get projectLineId =>
+      RealmObjectBase.get<String>(this, 'projectLineId') as String?;
+  @override
+  set projectLineId(String? value) =>
+      RealmObjectBase.set(this, 'projectLineId', value);
+
+  @override
+  String get serialNumber =>
+      RealmObjectBase.get<String>(this, 'serialNumber') as String;
+  @override
+  set serialNumber(String value) =>
+      RealmObjectBase.set(this, 'serialNumber', value);
+
+  @override
+  String? get ecouponType =>
+      RealmObjectBase.get<String>(this, 'ecouponType') as String?;
+  @override
+  set ecouponType(String? value) =>
+      RealmObjectBase.set(this, 'ecouponType', value);
+
+  @override
+  DateTime? get issueDate =>
+      RealmObjectBase.get<DateTime>(this, 'issueDate') as DateTime?;
+  @override
+  set issueDate(DateTime? value) =>
+      RealmObjectBase.set(this, 'issueDate', value);
+
+  @override
+  String? get issueInternalApp =>
+      RealmObjectBase.get<String>(this, 'issueInternalApp') as String?;
+  @override
+  set issueInternalApp(String? value) =>
+      RealmObjectBase.set(this, 'issueInternalApp', value);
+
+  @override
+  DateTime? get effectiveFromDate =>
+      RealmObjectBase.get<DateTime>(this, 'effectiveFromDate') as DateTime?;
+  @override
+  set effectiveFromDate(DateTime? value) =>
+      RealmObjectBase.set(this, 'effectiveFromDate', value);
+
+  @override
+  DateTime? get effectiveToDate =>
+      RealmObjectBase.get<DateTime>(this, 'effectiveToDate') as DateTime?;
+  @override
+  set effectiveToDate(DateTime? value) =>
+      RealmObjectBase.set(this, 'effectiveToDate', value);
+
+  @override
+  String? get staffId =>
+      RealmObjectBase.get<String>(this, 'staffId') as String?;
+  @override
+  set staffId(String? value) => RealmObjectBase.set(this, 'staffId', value);
+
+  @override
+  String? get applicationCustomerId =>
+      RealmObjectBase.get<String>(this, 'applicationCustomerId') as String?;
+  @override
+  set applicationCustomerId(String? value) =>
+      RealmObjectBase.set(this, 'applicationCustomerId', value);
+
+  @override
+  DateTime? get createdDate =>
+      RealmObjectBase.get<DateTime>(this, 'createdDate') as DateTime?;
+  @override
+  set createdDate(DateTime? value) =>
+      RealmObjectBase.set(this, 'createdDate', value);
+
+  @override
+  DateTime? get lastModifiedDate =>
+      RealmObjectBase.get<DateTime>(this, 'lastModifiedDate') as DateTime?;
+  @override
+  set lastModifiedDate(DateTime? value) =>
+      RealmObjectBase.set(this, 'lastModifiedDate', value);
+
+  @override
+  DateTime? get usedDate =>
+      RealmObjectBase.get<DateTime>(this, 'usedDate') as DateTime?;
+  @override
+  set usedDate(DateTime? value) => RealmObjectBase.set(this, 'usedDate', value);
+
+  @override
+  String? get referenceId =>
+      RealmObjectBase.get<String>(this, 'referenceId') as String?;
+  @override
+  set referenceId(String? value) =>
+      RealmObjectBase.set(this, 'referenceId', value);
+
+  @override
+  Stream<RealmObjectChanges<ECoupon>> get changes =>
+      RealmObjectBase.getChanges<ECoupon>(this);
+
+  @override
+  ECoupon freeze() => RealmObjectBase.freezeObject<ECoupon>(this);
+
+  static SchemaObject get schema => _schema ??= _initSchema();
+  static SchemaObject? _schema;
+  static SchemaObject _initSchema() {
+    RealmObjectBase.registerFactory(ECoupon._);
+    return const SchemaObject(ObjectType.realmObject, ECoupon, 'ecoupon', [
+      SchemaProperty('id', RealmPropertyType.objectid,
+          mapTo: '_id', primaryKey: true),
+      SchemaProperty('projectCode', RealmPropertyType.string, optional: true),
+      SchemaProperty('projectLineId', RealmPropertyType.string, optional: true),
+      SchemaProperty('serialNumber', RealmPropertyType.string),
+      SchemaProperty('ecouponType', RealmPropertyType.string, optional: true),
+      SchemaProperty('issueDate', RealmPropertyType.timestamp, optional: true),
+      SchemaProperty('issueInternalApp', RealmPropertyType.string,
+          optional: true),
+      SchemaProperty('effectiveFromDate', RealmPropertyType.timestamp,
+          optional: true),
+      SchemaProperty('effectiveToDate', RealmPropertyType.timestamp,
+          optional: true),
+      SchemaProperty('staffId', RealmPropertyType.string, optional: true),
+      SchemaProperty('applicationCustomerId', RealmPropertyType.string,
+          optional: true),
+      SchemaProperty('createdDate', RealmPropertyType.timestamp,
+          optional: true),
+      SchemaProperty('lastModifiedDate', RealmPropertyType.timestamp,
+          optional: true),
+      SchemaProperty('usedDate', RealmPropertyType.timestamp, optional: true),
+      SchemaProperty('referenceId', RealmPropertyType.string, optional: true),
     ]);
   }
 }

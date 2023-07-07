@@ -18,6 +18,8 @@ class _CustomerSession {
   late String employeeId;
   late String employeeName;
   late DateTime? endedDate;
+
+  late String? customerId;
   late String? customerName;
   late List<_BrowsingHistories> browsingHistories;
   late _UIPersistShoppingBag? uiPersistShoppingBag;
@@ -37,7 +39,11 @@ class _ShoppingBag {
   late String? signatureBase64Data;
   late String? customerId;
   late String? departmentCode;
+
+  // late String? customerName;
+  // late String? currentProgress;
   late List<_ShoppingBagItem> items;
+  late List<String> couponCodes;
 }
 
 @RealmModel(ObjectType.embeddedObject)
@@ -55,8 +61,45 @@ class _ShoppingBagItem {
   late DateTime? lastModifiedDate;
   late double? netAmount;
   late double? laborCost;
+  late String? status;
 
+// late String? itemType;
+// late String? itemNumber;
+// late List<String> imagesPath;
+// late DateTime? expireAmountDate;
+// late int qtyInCart;
+// late DateTime? addCartDate;
+// late List<_ProductDiscount> discounts;
+// late bool? isRemoted;
+// late int? earmarkQuantity;
+// late String? catalogItemCode;
+// late _CatalogItemTitle? brand;
+// late _CatalogItemTitle? collection;
+// late _CatalogItemTitle? subCollection;
+// late bool? fixedPriceIndicator;
+// late double? goldPrice;
+// late _ShowFieldRules? showFieldRules;
+// late _BookingUnit? bookingUnitInfo;
 }
+
+// @RealmModel(ObjectType.embeddedObject)
+// class _Customization {
+//   late int ringSize;
+//   late String? engravingFont;
+//   late String? engravingContent;
+//   late int chalcedonyQuantity;
+//   late String? comments;
+// }
+
+// @RealmModel(ObjectType.embeddedObject)
+// class _Gifts {
+//   late String itemId;
+//   late String bookingUnitType;
+//   late String bookingUnitValue;
+//   late String couponId;
+//   late String couponCode;
+//   late bool giveUpIndicator;
+// }
 
 @RealmModel(ObjectType.embeddedObject)
 class _BrowsingHistories {
@@ -66,6 +109,46 @@ class _BrowsingHistories {
   late String? saleType;
 }
 
+// @RealmModel(ObjectType.embeddedObject)
+// class _HistoryItem {
+//   late ObjectId id;
+//   late String? itemType;
+//   late double? modelSequenceNumber;
+//   late String? inventoryId;
+//   late String? itemNumber;
+//   late int quantity;
+//   late DateTime createdDate;
+//   late DateTime? lastModifiedDate;
+//   late List<String> imagesPath;
+//   late double? netAmount;
+//   late double? inventoryAmount;
+//   late DateTime? expireAmountDate;
+//   late int qtyInCart;
+//   late DateTime? addCartDate;
+//
+//   // late double? laborCost;
+//   late List<_ProductDiscount> discounts;
+//   late String? selectedDiscountCode;
+//   late int? lineNumber;
+//   late bool? isRemoted;
+//   late int? earmarkQuantity;
+//
+//
+//   late String? catalogItemCode;
+//   late _CatalogItemTitle? brand;
+//   late _CatalogItemTitle? collection;
+//   late _CatalogItemTitle? subCollection;
+//   late bool? fixedPriceIndicator;
+//   late double? goldPrice;
+//   late _ShowFieldRules? showFieldRules;
+//   late _BookingUnit? bookingUnitInfo;
+// }
+
+// @RealmModel(ObjectType.embeddedObject)
+// class _ShowFieldRules {
+//   late String? fieldName;
+//   late bool? showIndicator;
+// }
 
 @RealmModel(ObjectType.embeddedObject)
 class _UIPersistShoppingBag {
@@ -82,6 +165,7 @@ class _CacheProductItem {
   late List<String> imagesPath;
   late double? netAmount;
   late double? inventoryAmount;
+  late String? productOption;
 
   // late double? laborCost;
   late List<_ProductDiscount> discounts;
@@ -116,9 +200,11 @@ class _CatalogItemTitle {
 class _BookingUnit {
   late _BookingUnitsCbu? cbu;
   late int? earmarkQuantity;
+
   // late String? modelNumber;
   late double? modelSequenceNumber;
   late String? departmentCode;
+
   // late String? departmentName;
   late String? shape;
   late String? diamondBrand;
@@ -127,10 +213,13 @@ class _BookingUnit {
   late int? price;
   late String? goldType;
   late double? caratWeight;
+
   // late String? weightCode;
   late String? color;
+
   // late double? grossWeightTael;
   late double? grossWeightGram;
+
   // late double? bookWeightTael;
   // late double? bookWeightGram;
   // late double? physicalWeightTael;
@@ -152,4 +241,26 @@ class _BookingUnit {
 class _BookingUnitsCbu {
   late String? inventoryId;
   late double? modelSequenceNumber;
+}
+
+@RealmModel()
+@MapTo('ecoupon')
+class _ECoupon {
+  @PrimaryKey()
+  @MapTo("_id")
+  late ObjectId id;
+  late String? projectCode;
+  late String? projectLineId;
+  late String serialNumber;
+  late String? ecouponType;
+  late DateTime? issueDate;
+  late String? issueInternalApp;
+  late DateTime? effectiveFromDate;
+  late DateTime? effectiveToDate;
+  late String? staffId;
+  late String? applicationCustomerId;
+  late DateTime? createdDate;
+  late DateTime? lastModifiedDate;
+  late DateTime? usedDate;
+  late String? referenceId;
 }

@@ -21,6 +21,7 @@ class CatalogItem extends _CatalogItem
     Reference? materialCategory,
     Iterable<String> departmentCodes = const [],
     Iterable<ProductTagType> earringsType = const [],
+    Iterable<PhysicalWeight> standardSpecificationPhysicalWeight = const [],
   }) {
     RealmObjectBase.set(this, '_id', id);
     RealmObjectBase.set(this, 'catalogItem', catalogItem);
@@ -36,6 +37,10 @@ class CatalogItem extends _CatalogItem
         this, 'departmentCodes', RealmList<String>(departmentCodes));
     RealmObjectBase.set<RealmList<ProductTagType>>(
         this, 'earringsType', RealmList<ProductTagType>(earringsType));
+    RealmObjectBase.set<RealmList<PhysicalWeight>>(
+        this,
+        'standardSpecificationPhysicalWeight',
+        RealmList<PhysicalWeight>(standardSpecificationPhysicalWeight));
   }
 
   CatalogItem._();
@@ -125,6 +130,16 @@ class CatalogItem extends _CatalogItem
       throw RealmUnsupportedSetError();
 
   @override
+  RealmList<PhysicalWeight> get standardSpecificationPhysicalWeight =>
+      RealmObjectBase.get<PhysicalWeight>(
+              this, 'standardSpecificationPhysicalWeight')
+          as RealmList<PhysicalWeight>;
+  @override
+  set standardSpecificationPhysicalWeight(
+          covariant RealmList<PhysicalWeight> value) =>
+      throw RealmUnsupportedSetError();
+
+  @override
   Stream<RealmObjectChanges<CatalogItem>> get changes =>
       RealmObjectBase.getChanges<CatalogItem>(this);
 
@@ -159,6 +174,10 @@ class CatalogItem extends _CatalogItem
           optional: true, linkTarget: 'Reference'),
       SchemaProperty('earringsType', RealmPropertyType.object,
           linkTarget: 'ProductTagType',
+          collectionType: RealmCollectionType.list),
+      SchemaProperty(
+          'standardSpecificationPhysicalWeight', RealmPropertyType.object,
+          linkTarget: 'PhysicalWeight',
           collectionType: RealmCollectionType.list),
     ]);
   }
@@ -957,16 +976,16 @@ class ProductSampleInfoObject extends _ProductSampleInfoObject
 
 class PhysicalWeight extends _PhysicalWeight
     with RealmEntity, RealmObjectBase, EmbeddedObject {
-  PhysicalWeight(
-    String lastModifyUser,
-    String sizeReferenceCode,
-    ObjectId fdmStandardSpecificationPhysicalWeightId,
-    int productId,
-    double upperBound,
-    double lowerBound,
-    DateTime lastModifyDate,
-    String weightUnit,
-  ) {
+  PhysicalWeight({
+    String? lastModifyUser,
+    String? sizeReferenceCode,
+    ObjectId? fdmStandardSpecificationPhysicalWeightId,
+    double? productId,
+    double? upperBound,
+    double? lowerBound,
+    DateTime? lastModifyDate,
+    String? weightUnit,
+  }) {
     RealmObjectBase.set(this, 'lastModifyUser', lastModifyUser);
     RealmObjectBase.set(this, 'sizeReferenceCode', sizeReferenceCode);
     RealmObjectBase.set(this, 'FDM_standardSpecificationPhysicalWeight_id',
@@ -981,59 +1000,60 @@ class PhysicalWeight extends _PhysicalWeight
   PhysicalWeight._();
 
   @override
-  String get lastModifyUser =>
-      RealmObjectBase.get<String>(this, 'lastModifyUser') as String;
+  String? get lastModifyUser =>
+      RealmObjectBase.get<String>(this, 'lastModifyUser') as String?;
   @override
-  set lastModifyUser(String value) =>
+  set lastModifyUser(String? value) =>
       RealmObjectBase.set(this, 'lastModifyUser', value);
 
   @override
-  String get sizeReferenceCode =>
-      RealmObjectBase.get<String>(this, 'sizeReferenceCode') as String;
+  String? get sizeReferenceCode =>
+      RealmObjectBase.get<String>(this, 'sizeReferenceCode') as String?;
   @override
-  set sizeReferenceCode(String value) =>
+  set sizeReferenceCode(String? value) =>
       RealmObjectBase.set(this, 'sizeReferenceCode', value);
 
   @override
-  ObjectId get fdmStandardSpecificationPhysicalWeightId =>
+  ObjectId? get fdmStandardSpecificationPhysicalWeightId =>
       RealmObjectBase.get<ObjectId>(
-          this, 'FDM_standardSpecificationPhysicalWeight_id') as ObjectId;
+          this, 'FDM_standardSpecificationPhysicalWeight_id') as ObjectId?;
   @override
-  set fdmStandardSpecificationPhysicalWeightId(ObjectId value) =>
+  set fdmStandardSpecificationPhysicalWeightId(ObjectId? value) =>
       RealmObjectBase.set(
           this, 'FDM_standardSpecificationPhysicalWeight_id', value);
 
   @override
-  int get productId => RealmObjectBase.get<int>(this, 'productId') as int;
+  double? get productId =>
+      RealmObjectBase.get<double>(this, 'productId') as double?;
   @override
-  set productId(int value) => RealmObjectBase.set(this, 'productId', value);
+  set productId(double? value) => RealmObjectBase.set(this, 'productId', value);
 
   @override
-  double get upperBound =>
-      RealmObjectBase.get<double>(this, 'upperBound') as double;
+  double? get upperBound =>
+      RealmObjectBase.get<double>(this, 'upperBound') as double?;
   @override
-  set upperBound(double value) =>
+  set upperBound(double? value) =>
       RealmObjectBase.set(this, 'upperBound', value);
 
   @override
-  double get lowerBound =>
-      RealmObjectBase.get<double>(this, 'lowerBound') as double;
+  double? get lowerBound =>
+      RealmObjectBase.get<double>(this, 'lowerBound') as double?;
   @override
-  set lowerBound(double value) =>
+  set lowerBound(double? value) =>
       RealmObjectBase.set(this, 'lowerBound', value);
 
   @override
-  DateTime get lastModifyDate =>
-      RealmObjectBase.get<DateTime>(this, 'lastModifyDate') as DateTime;
+  DateTime? get lastModifyDate =>
+      RealmObjectBase.get<DateTime>(this, 'lastModifyDate') as DateTime?;
   @override
-  set lastModifyDate(DateTime value) =>
+  set lastModifyDate(DateTime? value) =>
       RealmObjectBase.set(this, 'lastModifyDate', value);
 
   @override
-  String get weightUnit =>
-      RealmObjectBase.get<String>(this, 'weightUnit') as String;
+  String? get weightUnit =>
+      RealmObjectBase.get<String>(this, 'weightUnit') as String?;
   @override
-  set weightUnit(String value) =>
+  set weightUnit(String? value) =>
       RealmObjectBase.set(this, 'weightUnit', value);
 
   @override
@@ -1049,16 +1069,19 @@ class PhysicalWeight extends _PhysicalWeight
     RealmObjectBase.registerFactory(PhysicalWeight._);
     return const SchemaObject(
         ObjectType.embeddedObject, PhysicalWeight, 'PhysicalWeight', [
-      SchemaProperty('lastModifyUser', RealmPropertyType.string),
-      SchemaProperty('sizeReferenceCode', RealmPropertyType.string),
+      SchemaProperty('lastModifyUser', RealmPropertyType.string,
+          optional: true),
+      SchemaProperty('sizeReferenceCode', RealmPropertyType.string,
+          optional: true),
       SchemaProperty('fdmStandardSpecificationPhysicalWeightId',
           RealmPropertyType.objectid,
-          mapTo: 'FDM_standardSpecificationPhysicalWeight_id'),
-      SchemaProperty('productId', RealmPropertyType.int),
-      SchemaProperty('upperBound', RealmPropertyType.double),
-      SchemaProperty('lowerBound', RealmPropertyType.double),
-      SchemaProperty('lastModifyDate', RealmPropertyType.timestamp),
-      SchemaProperty('weightUnit', RealmPropertyType.string),
+          mapTo: 'FDM_standardSpecificationPhysicalWeight_id', optional: true),
+      SchemaProperty('productId', RealmPropertyType.double, optional: true),
+      SchemaProperty('upperBound', RealmPropertyType.double, optional: true),
+      SchemaProperty('lowerBound', RealmPropertyType.double, optional: true),
+      SchemaProperty('lastModifyDate', RealmPropertyType.timestamp,
+          optional: true),
+      SchemaProperty('weightUnit', RealmPropertyType.string, optional: true),
     ]);
   }
 }

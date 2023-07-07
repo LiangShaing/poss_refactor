@@ -19,6 +19,7 @@ class _CatalogItem {
   late List<String> departmentCodes;
   late _Reference? materialCategory;
   late List<_ProductTagType> earringsType;
+  late List<_PhysicalWeight> standardSpecificationPhysicalWeight;
 }
 
 
@@ -167,13 +168,13 @@ class _ProductSampleInfoObject{
 
 @RealmModel(ObjectType.embeddedObject)
 class _PhysicalWeight{
-  late String lastModifyUser;
-  late String sizeReferenceCode;
+  late String? lastModifyUser;
+  late String? sizeReferenceCode;
   @MapTo("FDM_standardSpecificationPhysicalWeight_id")
-  late ObjectId fdmStandardSpecificationPhysicalWeightId;
-  late int productId;
-  late double upperBound;
-  late double lowerBound;
-  late DateTime lastModifyDate;
-  late String weightUnit;
+  late ObjectId? fdmStandardSpecificationPhysicalWeightId;
+  late double? productId;
+  late double? upperBound;
+  late double? lowerBound;
+  late DateTime? lastModifyDate;
+  late String? weightUnit;
 }

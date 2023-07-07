@@ -660,6 +660,9 @@ class BomCertificate extends _BomCertificate
     String? inventoryId,
     String? from,
     String? createUser,
+    String? physicalCertificateIndicator,
+    String? reportPdfPath,
+    String? digitalCardPath,
   }) {
     RealmObjectBase.set(
         this, 'cnPhysicalCertificateIndicator', cnPhysicalCertificateIndicator);
@@ -670,6 +673,10 @@ class BomCertificate extends _BomCertificate
     RealmObjectBase.set(this, 'inventoryId', inventoryId);
     RealmObjectBase.set(this, 'from', from);
     RealmObjectBase.set(this, 'createUser', createUser);
+    RealmObjectBase.set(
+        this, 'physicalCertificateIndicator', physicalCertificateIndicator);
+    RealmObjectBase.set(this, 'reportPdfPath', reportPdfPath);
+    RealmObjectBase.set(this, 'digitalCardPath', digitalCardPath);
   }
 
   BomCertificate._();
@@ -723,6 +730,28 @@ class BomCertificate extends _BomCertificate
       RealmObjectBase.set(this, 'createUser', value);
 
   @override
+  String? get physicalCertificateIndicator =>
+      RealmObjectBase.get<String>(this, 'physicalCertificateIndicator')
+          as String?;
+  @override
+  set physicalCertificateIndicator(String? value) =>
+      RealmObjectBase.set(this, 'physicalCertificateIndicator', value);
+
+  @override
+  String? get reportPdfPath =>
+      RealmObjectBase.get<String>(this, 'reportPdfPath') as String?;
+  @override
+  set reportPdfPath(String? value) =>
+      RealmObjectBase.set(this, 'reportPdfPath', value);
+
+  @override
+  String? get digitalCardPath =>
+      RealmObjectBase.get<String>(this, 'digitalCardPath') as String?;
+  @override
+  set digitalCardPath(String? value) =>
+      RealmObjectBase.set(this, 'digitalCardPath', value);
+
+  @override
   Stream<RealmObjectChanges<BomCertificate>> get changes =>
       RealmObjectBase.getChanges<BomCertificate>(this);
 
@@ -746,6 +775,11 @@ class BomCertificate extends _BomCertificate
       SchemaProperty('inventoryId', RealmPropertyType.string, optional: true),
       SchemaProperty('from', RealmPropertyType.string, optional: true),
       SchemaProperty('createUser', RealmPropertyType.string, optional: true),
+      SchemaProperty('physicalCertificateIndicator', RealmPropertyType.string,
+          optional: true),
+      SchemaProperty('reportPdfPath', RealmPropertyType.string, optional: true),
+      SchemaProperty('digitalCardPath', RealmPropertyType.string,
+          optional: true),
     ]);
   }
 }

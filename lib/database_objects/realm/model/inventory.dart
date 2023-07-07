@@ -90,6 +90,9 @@ class _BomCertificate {
   late String? inventoryId;
   late String? from;
   late String? createUser;
+  late String? physicalCertificateIndicator;
+  late String? reportPdfPath;
+  late String? digitalCardPath;
 }
 
 @RealmModel(ObjectType.embeddedObject)
