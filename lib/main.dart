@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
         providers: [
           BlocProvider<AppMgmtBloc>(create: (_) => AppMgmtBloc()..add(AppMgmtInitialed())),
-          BlocProvider<LocalizationBloc>(create: (_) => LocalizationBloc()),
+          // BlocProvider<LocalizationBloc>(create: (_) => LocalizationBloc()),
           BlocProvider<RealmMgmtBloc>(
             create: (BuildContext context) => RealmMgmtBloc(realmAuthorizedRepository: RealmAuthorizedRepository()),
           ),
@@ -65,47 +65,45 @@ class MyApp extends StatelessWidget {
               Logger.error(message: "AppInitLoadFailure");
               exit(1);
             default:
-              widget = BlocBuilder<LocalizationBloc, LocalizationState>(builder: (context, state) {
-                return AppLifeCycleManagerStatefulWidget(
-                  child: MaterialApp(
-                    navigatorKey: navigationKey,
-                    theme: appThemeData(context),
-                    debugShowCheckedModeBanner: false,
-                    localizationsDelegates: const [
-                      GlobalMaterialLocalizations.delegate,
-                      GlobalWidgetsLocalizations.delegate,
-                      GlobalCupertinoLocalizations.delegate,
-                      Translate.delegate,
-                    ],
-                    supportedLocales: Translate.supportLocale,
-                    localeResolutionCallback: (locale, supportedLocales) {
-                      if (locale != null) {
-                        if (locale == state.locale) {
-                          return null;
-                        }
-                        Future(() {
-                          Locale lang = Translate.getLocaleFromLocaleString(locale.toLanguageTag());
-                          Logger.debug(message: "localeResolutionCallback _locale : ${lang.toString()}");
-                          context.read<LocalizationBloc>().add(LocalizationChanged(locale: lang));
-                        });
+              widget = AppLifeCycleManagerStatefulWidget(
+                child: MaterialApp(
+                  navigatorKey: navigationKey,
+                  theme: appThemeData(context),
+                  debugShowCheckedModeBanner: false,
+                  localizationsDelegates: const [
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                    Translate.delegate,
+                  ],
+                  supportedLocales: Translate.supportLocale,
+                  localeResolutionCallback: (locale, supportedLocales) {
+                    if (locale != null) {
+                      if (locale == state.locale) {
+                        return null;
                       }
-                      return null;
-                    },
-                    locale: state.locale,
-                    // initialRoute: "/",
-                    // routes: {
-                    //   '/': (context) => const LoginScreen(),
-                    //   "/index": (context) => const IndexScreen(),
-                    //   "/pagea": (context) => const PageAScreen(),
-                    //   "/pageb": (context) => const PageBScreen(),
-                    // },
-                    initialRoute: BaseRoute.loginScreenRouteName,
-                    onGenerateRoute: (settings) {
-                      return GenerateRoute.route(routeSettings: settings);
-                    },
-                  ),
-                );
-              });
+                      Future(() {
+                        Locale lang = Translate.getLocaleFromLocaleString(locale.toLanguageTag());
+                        Logger.debug(message: "localeResolutionCallback _locale : ${lang.toString()}");
+                        context.read<AppMgmtBloc>().add(AppMgmtLocalizationChanged(locale: lang));
+                      });
+                    }
+                    return null;
+                  },
+                  locale: state.locale,
+                  // initialRoute: "/",
+                  // routes: {
+                  //   '/': (context) => const LoginScreen(),
+                  //   "/index": (context) => const IndexScreen(),
+                  //   "/pagea": (context) => const PageAScreen(),
+                  //   "/pageb": (context) => const PageBScreen(),
+                  // },
+                  initialRoute: BaseRoute.loginScreenRouteName,
+                  onGenerateRoute: (settings) {
+                    return GenerateRoute.route(routeSettings: settings);
+                  },
+                ),
+              );
               break;
           }
           return widget;

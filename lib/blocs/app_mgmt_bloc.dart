@@ -16,6 +16,7 @@ class AppMgmtBloc extends AbstractBloc<AppMgmtEvent, AppMgmtState> {
     on<AppMgmtOauthCodeReturned>(_oauthCodeReturned);
     on<AppMgmtDrawerOpened>(_drawerOpened);
     on<AppMgmtDrawerClosed>(_drawerClosed);
+    on<AppMgmtLocalizationChanged>(_onChangeLanguage);
   }
 
   Future<void> _appInitialed(AppMgmtEvent event, Emitter<AppMgmtState> emit) async {
@@ -85,4 +86,9 @@ class AppMgmtBloc extends AbstractBloc<AppMgmtEvent, AppMgmtState> {
   void _drawerClosed(AppMgmtEvent event, Emitter<AppMgmtState> emit) {
     emit(state.copyWith(drawer: false));
   }
+
+  void _onChangeLanguage(AppMgmtLocalizationChanged event, Emitter<AppMgmtState> emit) async {
+    emit(state.copyWith(locale: event.locale));
+  }
+
 }
