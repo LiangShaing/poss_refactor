@@ -58,7 +58,11 @@ class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSes
   Future<void> _initialCustomerSession(CustomerSessionInitialed event, Emitter<CustomerSessionState> emit) async {
     Logger.info(className: "CustomerSessionBloc", event: "_initialCustomerSession", message: "started");
     emit(CustomerSessionLoadInProgress());
-    CustomerSession? currentCustomerSession = customerSessionRepository.currentCustomerSession;
+    Map<String, dynamic> userInfo = await authenticationRepository.getTokenInfo();
+    List<String> displayName = userInfo['displayName'].toString().split(" ");
+
+    CustomerSession? currentCustomerSession = customerSessionRepository
+        .currentCustomerSession(Employee(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), []));
     Logger.info(
         className: "CustomerSessionBloc",
         event: "_initialCustomerSession",
@@ -73,7 +77,11 @@ class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSes
   Future<void> _closeCustomerSession(CustomerSessionEvent event, Emitter<CustomerSessionState> emit) async {
     Logger.info(className: "CustomerSessionBloc", event: "_closeCustomerSession", message: "started");
     emit(CustomerSessionLoadInProgress());
-    CustomerSession? currentCustomerSession = customerSessionRepository.currentCustomerSession;
+    Map<String, dynamic> userInfo = await authenticationRepository.getTokenInfo();
+    List<String> displayName = userInfo['displayName'].toString().split(" ");
+
+    CustomerSession? currentCustomerSession = customerSessionRepository
+        .currentCustomerSession(Employee(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), []));
 
     if (currentCustomerSession != null) {
       // bool _hasCtId = ['', null].contains(_ctId);

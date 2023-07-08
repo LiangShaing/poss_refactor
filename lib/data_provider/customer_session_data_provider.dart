@@ -5,9 +5,14 @@ import 'package:realm/realm.dart';
 
 class CustomerSessionDataProvider extends RealmDataProvider {
   RealmResults<CustomerSession> findCurrentCustomerSessionByEmployee(Employee employee) {
+    DateTime current = DateTime.now().toUtc();
     return realmSyncDao.realm.query<CustomerSession>(
-        r'departmentCode == $0 AND employeeId==$1 AND checkInIndicator == $2',
-        [employee.defaultDepartmentCode, employee.employeeId, true]);
+        r'departmentCode == $0 AND employeeId==$1 AND checkInIndicator == $2 AND createdDate >= $3', [
+      employee.defaultDepartmentCode,
+      employee.employeeId,
+      true,
+      DateTime.utc(current.year, current.month, current.day, 00, 00, 00)
+    ]);
   }
 
   Future<void> createCustomerSession(CustomerSession customerSession) async {

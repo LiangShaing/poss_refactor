@@ -170,7 +170,8 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
                     BlocProvider<ProductBloc>(
                         create: (BuildContext context) => ProductBloc(
                             productRepository: ProductRepository(),
-                            authenticationRepository: AuthenticationRepository()),
+                            authenticationRepository: AuthenticationRepository(),
+                            customerSessionRepository: CustomerSessionRepository()),
                         child: BlocListener<ProductBloc, ProductState>(
                           listener: (context, state) {
                             if (state is ProductLoadFailure) {

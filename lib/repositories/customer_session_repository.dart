@@ -32,7 +32,7 @@ class CustomerSessionRepository {
     // });
   }
 
-  CustomerSession? get currentCustomerSession {
-    return customerSessionResults?.lastOrNull;
+  CustomerSession? currentCustomerSession(Employee employee) {
+    return dataProvider.findCurrentCustomerSessionByEmployee(employee).lastOrNull;
   }
 }
