@@ -5,14 +5,14 @@ abstract class RealmMgmtState<T> extends Equatable {
   final bool isLogin;
   final bool isUpdateSubscriptions;
   final bool isRealmConnect;
-  final EmployeePOJO? employeePOJO;
+  final Employee? employee;
 
   const RealmMgmtState(
-      {required this.isLogin, required this.isUpdateSubscriptions, required this.isRealmConnect, this.employeePOJO})
+      {required this.isLogin, required this.isUpdateSubscriptions, required this.isRealmConnect, this.employee})
       : super();
 
   @override
-  List<Object?> get props => [isLogin, isUpdateSubscriptions, isRealmConnect,employeePOJO];
+  List<Object?> get props => [isLogin, isUpdateSubscriptions, isRealmConnect,employee];
 }
 
 class RealmMgmtAuthenticatedInitial extends RealmMgmtState {
@@ -20,7 +20,7 @@ class RealmMgmtAuthenticatedInitial extends RealmMgmtState {
       {required super.isLogin,
       required super.isUpdateSubscriptions,
       required super.isRealmConnect,
-      super.employeePOJO});
+      super.employee});
 
   @override
   List<Object> get props => [];
@@ -31,7 +31,7 @@ class RealmMgmtLoadInProgress extends RealmMgmtState {
       {required super.isLogin,
       required super.isUpdateSubscriptions,
       required super.isRealmConnect,
-      super.employeePOJO});
+      super.employee});
 
   @override
   List<Object> get props => [];
@@ -42,7 +42,7 @@ class RealmMgmtAuthenticatedSuccess extends RealmMgmtState {
       {required super.isLogin,
       required super.isUpdateSubscriptions,
       required super.isRealmConnect,
-      super.employeePOJO});
+      super.employee});
 
   @override
   List<Object> get props => [];
@@ -53,7 +53,7 @@ class RealmMgmtLoadFailure extends RealmMgmtState {
       {required super.isLogin,
       required super.isUpdateSubscriptions,
       required super.isRealmConnect,
-      super.employeePOJO});
+      super.employee});
 
   @override
   List<Object> get props => [];
@@ -64,7 +64,7 @@ class RealmMgmtSubscriptionsLoadInProgress extends RealmMgmtState {
   {required super.isLogin,
   required super.isUpdateSubscriptions,
   required super.isRealmConnect,
-  super.employeePOJO});
+  super.employee});
 
 @override
 List<Object> get props => [];
@@ -75,7 +75,7 @@ class RealmMgmtSubscriptionsUpdatedSuccess extends RealmMgmtState {
       {required super.isLogin,
       required super.isUpdateSubscriptions,
       required super.isRealmConnect,
-      super.employeePOJO});
+      super.employee});
 
   @override
   List<Object> get props => [];

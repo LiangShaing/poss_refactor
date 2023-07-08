@@ -3,13 +3,13 @@ import 'package:mobile_poss_gp01/database_objects/user/pojo/employee_pojo.dart';
 abstract class RealmMgmtEvent {}
 
 class RealmMgmtLoginRequested extends RealmMgmtEvent {
-  final EmployeePOJO? employeePOJO;
+  final Employee? employeePOJO;
 
   RealmMgmtLoginRequested({this.employeePOJO});
 }
 
 class RealmMgmtUpdateSubscriptionsStarted extends RealmMgmtEvent {
-  final EmployeePOJO employeePOJO;
+  final Employee employeePOJO;
 
   RealmMgmtUpdateSubscriptionsStarted({required this.employeePOJO});
 }

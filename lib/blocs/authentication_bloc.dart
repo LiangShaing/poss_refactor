@@ -87,7 +87,7 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
           status: BlocStatus.success,
           refreshTokenExisted: true,
           accessTokenExisted: true,
-          employeePOJO: EmployeePOJO(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), [])));
+          employee: Employee(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), [])));
     } else {
       Logger.login(
           className: "AuthenticationBloc", event: "_login", status: "ERROR", message: "get oauth token unsuccessful");
@@ -131,7 +131,7 @@ class AuthenticationBloc extends AbstractBloc<AuthenticationEvent, Authenticatio
               status: BlocStatus.success,
               refreshTokenExisted: true,
               accessTokenExisted: true,
-              employeePOJO: EmployeePOJO(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), [])));
+              employee: Employee(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), [])));
         } else {
           emit(state.copyWith(
               status: BlocStatus.failure,

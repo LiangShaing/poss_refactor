@@ -48,7 +48,7 @@ class LoginScreen extends StatelessWidget {
                 /* 登入成功接續登入realm */
                 if (state.status == BlocStatus.success && state.refreshTokenExisted && state.accessTokenExisted) {
                   BlocProvider.of<RealmMgmtBloc>(context)
-                      .add(RealmMgmtLoginRequested(employeePOJO: state.employeePOJO));
+                      .add(RealmMgmtLoginRequested(employeePOJO: state.employee));
                 }
                 /* 錯誤 */
                 if (state.status == BlocStatus.failure) {
@@ -68,9 +68,9 @@ class LoginScreen extends StatelessWidget {
             ),
             BlocListener<RealmMgmtBloc, RealmMgmtState>(
               listener: (context, state) {
-                if (state.runtimeType == RealmMgmtAuthenticatedSuccess && state.employeePOJO != null) {
+                if (state.runtimeType == RealmMgmtAuthenticatedSuccess && state.employee != null) {
                   BlocProvider.of<RealmMgmtBloc>(context)
-                      .add(RealmMgmtUpdateSubscriptionsStarted(employeePOJO: state.employeePOJO!));
+                      .add(RealmMgmtUpdateSubscriptionsStarted(employeePOJO: state.employee!));
                 }
 
                 if (state.runtimeType == RealmMgmtSubscriptionsUpdatedSuccess) {

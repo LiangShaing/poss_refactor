@@ -23,18 +23,12 @@ class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSes
     on<CustomerSessionStarted>(_createCustomerSession);
     on<CustomerSessionTerminated>(_closeCustomerSession);
 
-    // customerSessionRepository.bindCustomerSessionResultsStreamListen(
-    //     EmployeePOJO("梁紫泳", "223720", "422",[]), (event) {
-    //   Logger.debug(message: "CustomerSessionBloc bindCustomerSessionResultsStreamListen");
-    //   add(CustomerSessionInitialed());
-    // });
-
     Future(() async {
       Map<String, dynamic> userInfo = await authenticationRepository.getTokenInfo();
       List<String> displayName = userInfo['displayName'].toString().split(" ");
 
       customerSessionRepository.bindCustomerSessionResultsStreamListen(
-          EmployeePOJO(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), []), (event) {
+          Employee(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), []), (event) {
         Logger.debug(message: "CustomerSessionBloc bindCustomerSessionResultsStreamListen");
         add(CustomerSessionInitialed());
       });

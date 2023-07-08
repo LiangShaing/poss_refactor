@@ -14,6 +14,16 @@ class ProductLoadInitial extends ProductState {
   List<Object> get props => [];
 }
 
+class ProductStoreLoadSuccess extends ProductState {
+  @override
+  List<Object> get props => [];
+}
+
+class ProductRemotedLoadSuccess extends ProductState {
+  @override
+  List<Object> get props => [];
+}
+
 class ProductLoadFailure extends ProductState {
   const ProductLoadFailure(this.errorMessage);
 

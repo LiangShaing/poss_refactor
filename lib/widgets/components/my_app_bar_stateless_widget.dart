@@ -168,11 +168,12 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
                     }),
                     /* 搜尋商品輸入欄 */
                     BlocProvider<ProductBloc>(
-                        create: (BuildContext context) => ProductBloc(productRepository: ProductRepository()),
+                        create: (BuildContext context) => ProductBloc(
+                            productRepository: ProductRepository(),
+                            authenticationRepository: AuthenticationRepository()),
                         child: BlocListener<ProductBloc, ProductState>(
                           listener: (context, state) {
-                            /* 登出成功導向首頁 */
-                            if (state.runtimeType == ProductLoadFailure) {
+                            if (state is ProductLoadFailure) {
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 behavior: SnackBarBehavior.floating,
                                 backgroundColor: ColorStyle.warningRed.withOpacity(0.6),
@@ -181,7 +182,7 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
                                   left: MediaQuery.of(context).size.width * 0.3,
                                   right: MediaQuery.of(context).size.width * 0.3,
                                 ),
-                                content: Center(child: Text((state as ProductLoadFailure).errorMessage)),
+                                content: Center(child: Text(state.errorMessage)),
                               ));
                             }
                           },

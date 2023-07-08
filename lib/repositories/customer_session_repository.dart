@@ -11,9 +11,9 @@ class CustomerSessionRepository {
   StreamSubscription? _realmCustomerSessionResultsStream;
   RealmResults<CustomerSession>? customerSessionResults;
 
-  void bindCustomerSessionResultsStreamListen(EmployeePOJO employeePOJO, callbackFun) {
+  void bindCustomerSessionResultsStreamListen(Employee employee, callbackFun) {
     _realmCustomerSessionResultsStream?.cancel();
-    customerSessionResults = dataProvider.findCurrentCustomerSessionByEmployee(employeePOJO);
+    customerSessionResults = dataProvider.findCurrentCustomerSessionByEmployee(employee);
     _realmCustomerSessionResultsStream = customerSessionResults?.changes.listen(callbackFun);
   }
 

@@ -1,12 +1,12 @@
-class EmployeePOJO {
+class Employee {
   String name;
   String employeeId;
   String defaultDepartmentCode;
-  List<DepartmentPOJO> departments;
+  List<Department> departments;
 
-  EmployeePOJO(this.name, this.employeeId, this.defaultDepartmentCode, this.departments);
+  Employee(this.name, this.employeeId, this.defaultDepartmentCode, this.departments);
 
-  EmployeePOJO.clone(EmployeePOJO ori)
+  Employee.clone(Employee ori)
       : this(
           ori.name,
           ori.employeeId,
@@ -15,14 +15,14 @@ class EmployeePOJO {
         );
 }
 
-class DepartmentPOJO {
+class Department {
   String name;
   String role;
   String code;
 
-  DepartmentPOJO(this.name, this.role, this.code);
+  Department(this.name, this.role, this.code);
 
-  DepartmentPOJO.clone(DepartmentPOJO ori)
+  Department.clone(Department ori)
       : this(
           ori.name,
           ori.role,

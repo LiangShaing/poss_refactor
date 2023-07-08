@@ -45,7 +45,7 @@ class RealmMgmtBloc extends AbstractBloc<RealmMgmtEvent, RealmMgmtState> {
       realmAuthorizedRepository.bindUploadProgressStreamListen(_uploadProgressStream);
       realmAuthorizedRepository.bindDownloadProgressStreamListen(_downloadProgressStream);
       emit(RealmMgmtAuthenticatedSuccess(
-          isLogin: true, isUpdateSubscriptions: false, isRealmConnect: false, employeePOJO: event.employeePOJO));
+          isLogin: true, isUpdateSubscriptions: false, isRealmConnect: false, employee: event.employeePOJO));
     } catch (e) {
       log('RealmLoginBloc _realmLoginStarted : ${e.toString()}');
       emit(const RealmMgmtLoadFailure(isLogin: false, isUpdateSubscriptions: false, isRealmConnect: false));
