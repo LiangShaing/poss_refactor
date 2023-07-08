@@ -76,7 +76,7 @@ class LoginScreen extends StatelessWidget {
                 if (state.runtimeType == RealmMgmtSubscriptionsUpdatedSuccess) {
                   BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginScreenLeaved());
                   SchedulerBinding.instance.addPostFrameCallback((_) {
-                    MyNavigator.pushReset(BaseRoute.indexScreenRouteName);
+                    MyNavigator.pushReset(BaseRoute.menuScreenRouteName);
                   });
                 }
               },

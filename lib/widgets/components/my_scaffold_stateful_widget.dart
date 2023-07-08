@@ -67,7 +67,11 @@ class _MyScaffoldState extends State<MyScaffoldStatefulWidget> {
             });
           } else if (!state.drawer) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
-              MyNavigator.maybePop();
+              if (MyNavigator.canPop()) {
+                MyNavigator.pop();
+              } else {
+                MyNavigator.push(BaseRoute.indexScreenRouteName);
+              }
             });
           }
         })
