@@ -163,6 +163,7 @@ class RealmSyncDao {
       Collection.schema,
       ProductSampleInfoObject.schema,
       ProductTagType.schema,
+      PhysicalWeight.schema,
       /* Inventory */
       Inventory.schema,
       Bom.schema,
