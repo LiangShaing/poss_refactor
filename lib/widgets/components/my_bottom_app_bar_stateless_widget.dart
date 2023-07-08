@@ -1,5 +1,8 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_poss_gp01/blocs/app_mgmt_bloc.dart';
+import 'package:mobile_poss_gp01/events/app_mgmt_event.dart';
 import 'package:mobile_poss_gp01/resources/color_style.dart';
 import 'package:mobile_poss_gp01/resources/size_style.dart';
 import 'package:mobile_poss_gp01/resources/static_values.dart';
@@ -24,9 +27,10 @@ class MyBottomAppBarStatefulWidgetState extends State<MyBottomAppBarStatefulWidg
   void _onTap(MyBottomAppBarItem value) {
     // _appProvider.setBottomIndex(value.index);
     debugPrint("selectTabFunc ${value.index}");
-    if (value.pushRoute != null) {
-      widget.selectTabFunc(value.pushRoute!);
-    }
+    context.read<AppMgmtBloc>().add(AppMgmtTabChanged(index: value.index));
+    // if (value.pushRoute != null) {
+    //   widget.selectTabFunc(value.pushRoute!);
+    // }
   }
 
   @override

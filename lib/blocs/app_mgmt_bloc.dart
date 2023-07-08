@@ -17,6 +17,7 @@ class AppMgmtBloc extends AbstractBloc<AppMgmtEvent, AppMgmtState> {
     on<AppMgmtDrawerOpened>(_drawerOpened);
     on<AppMgmtDrawerClosed>(_drawerClosed);
     on<AppMgmtLocalizationChanged>(_onChangeLanguage);
+    on<AppMgmtTabChanged>(_onChangeTab);
   }
 
   Future<void> _appInitialed(AppMgmtEvent event, Emitter<AppMgmtState> emit) async {
@@ -60,14 +61,13 @@ class AppMgmtBloc extends AbstractBloc<AppMgmtEvent, AppMgmtState> {
   /// 初始化deep link function
   void _initHandleDeepLink() {
     Logger.info(className: "AppMgmtBloc", event: "_initHandleDeepLink", message: "started");
-      FlutterDeepLink.streamDeepLinkResult?.listen((deepLink) {
-        String code = _urlParser(deepLink);
-        if (code.isNotEmpty) {
-          Logger.debug(className: "AppMgmtBloc", message: "_initHandleDeepLink code[$code]");
-          add(AppMgmtOauthCodeReturned(code: code));
-        }
-      });
-
+    FlutterDeepLink.streamDeepLinkResult?.listen((deepLink) {
+      String code = _urlParser(deepLink);
+      if (code.isNotEmpty) {
+        Logger.debug(className: "AppMgmtBloc", message: "_initHandleDeepLink code[$code]");
+        add(AppMgmtOauthCodeReturned(code: code));
+      }
+    });
   }
 
   /// Oauth登入完成後執行
@@ -87,8 +87,11 @@ class AppMgmtBloc extends AbstractBloc<AppMgmtEvent, AppMgmtState> {
     emit(state.copyWith(drawer: false));
   }
 
-  void _onChangeLanguage(AppMgmtLocalizationChanged event, Emitter<AppMgmtState> emit) async {
+  void _onChangeLanguage(AppMgmtLocalizationChanged event, Emitter<AppMgmtState> emit) {
     emit(state.copyWith(locale: event.locale));
   }
 
+  void _onChangeTab(AppMgmtTabChanged event, Emitter<AppMgmtState> emit) {
+    emit(state.copyWith(tabIndex: event.index));
+  }
 }

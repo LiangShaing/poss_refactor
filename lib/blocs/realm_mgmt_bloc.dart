@@ -88,7 +88,7 @@ class RealmMgmtBloc extends AbstractBloc<RealmMgmtEvent, RealmMgmtState> {
 
   Future<void> _realmUpdateSubscriptions(
       RealmMgmtUpdateSubscriptionsStarted event, Emitter<RealmMgmtState> emit) async {
-    emit(const RealmMgmtLoadInProgress(
+    emit(const RealmMgmtSubscriptionsLoadInProgress(
       isLogin: true,
       isUpdateSubscriptions: false,
       isRealmConnect: true,

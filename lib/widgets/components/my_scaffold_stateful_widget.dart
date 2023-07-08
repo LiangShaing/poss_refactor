@@ -52,15 +52,15 @@ class MyScaffoldStatefulWidget extends StatefulWidget {
 }
 
 class _MyScaffoldState extends State<MyScaffoldStatefulWidget> {
-
-
   @override
   Widget build(BuildContext context) {
     late Widget watermark = Container();
 
     return MultiBlocListener(
       listeners: [
-        BlocListener<AppMgmtBloc, AppMgmtState>(listener: (context, state) {
+        BlocListener<AppMgmtBloc, AppMgmtState>(listenWhen: (previousState, state) {
+          return previousState.drawer != state.drawer;
+        }, listener: (context, state) {
           if (state.drawer) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               MyNavigator.push(BaseRoute.menuScreenRouteName);

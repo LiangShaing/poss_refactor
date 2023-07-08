@@ -59,6 +59,17 @@ class RealmMgmtLoadFailure extends RealmMgmtState {
   List<Object> get props => [];
 }
 
+class RealmMgmtSubscriptionsLoadInProgress extends RealmMgmtState {
+  const RealmMgmtSubscriptionsLoadInProgress(
+  {required super.isLogin,
+  required super.isUpdateSubscriptions,
+  required super.isRealmConnect,
+  super.employeePOJO});
+
+@override
+List<Object> get props => [];
+}
+
 class RealmMgmtSubscriptionsUpdatedSuccess extends RealmMgmtState {
   const RealmMgmtSubscriptionsUpdatedSuccess(
       {required super.isLogin,

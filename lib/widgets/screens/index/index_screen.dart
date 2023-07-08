@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_poss_gp01/blocs/app_mgmt_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/customer_session_bloc.dart';
 import 'package:mobile_poss_gp01/events/customer_session_event.dart';
 import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
+import 'package:mobile_poss_gp01/states/app_mgmt_state.dart';
 import 'package:mobile_poss_gp01/states/customer_session_state.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_scaffold_stateful_widget.dart';
 
@@ -12,34 +14,51 @@ class IndexScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<CustomerSessionBloc>(
-      create: (BuildContext context) => CustomerSessionBloc(
-          customerSessionRepository: CustomerSessionRepository(), authenticationRepository: AuthenticationRepository())
-        ..add(CustomerSessionInitialed()),
-      child: BlocBuilder<CustomerSessionBloc, CustomerSessionState>(
-          bloc: CustomerSessionBloc(
-              customerSessionRepository: CustomerSessionRepository(),
-              authenticationRepository: AuthenticationRepository()),
-          builder: _builder),
-    );
+    // return BlocProvider<CustomerSessionBloc>(
+    //   create: (BuildContext context) => CustomerSessionBloc(
+    //       customerSessionRepository: CustomerSessionRepository(), authenticationRepository: AuthenticationRepository())
+    //     ..add(CustomerSessionInitialed()),
+    //   child: BlocBuilder<CustomerSessionBloc, CustomerSessionState>(
+    //       bloc: CustomerSessionBloc(
+    //           customerSessionRepository: CustomerSessionRepository(),
+    //           authenticationRepository: AuthenticationRepository()),
+    //       builder: _builder),
+    // );
+
+    return  BlocBuilder<AppMgmtBloc, AppMgmtState>(builder: _builder);
   }
 
-  Widget _builder(BuildContext context, CustomerSessionState state) {
+  Widget _builder(BuildContext context, AppMgmtState state) {
     Widget widget;
 
-    switch (state.runtimeType) {
-      case CustomerSessionLoadInitial:
-        widget = const Text('--');
+    // switch (state.runtimeType) {
+    //   case CustomerSessionLoadInitial:
+    //     widget = const Text('--');
+    //     break;
+    //   case CustomerSessionLoadInProgress:
+    //     widget = const CircularProgressIndicator();
+    //     break;
+    //   case CustomerSessionLoadFailure:
+    //     widget = const Text('Something went wrong!');
+    //     break;
+    //   case CustomerSessionLoadSuccess:
+    //     CustomerSessionLoadSuccess data = state as CustomerSessionLoadSuccess;
+    //     widget = Text(data.customerSession?.code ?? "");
+    //     break;
+    //   default:
+    //     widget = Container();
+    // }
+print("state.tabIndex ${state.tabIndex}");
+
+    switch (state.tabIndex) {
+      case 1:
+        widget = const Text('1');
         break;
-      case CustomerSessionLoadInProgress:
+      case 2:
         widget = const CircularProgressIndicator();
         break;
-      case CustomerSessionLoadFailure:
-        widget = const Text('Something went wrong!');
-        break;
-      case CustomerSessionLoadSuccess:
-        CustomerSessionLoadSuccess data = state as CustomerSessionLoadSuccess;
-        widget = Text(data.customerSession?.code ?? "");
+      case 3:
+        widget = const Text('3');
         break;
       default:
         widget = Container();

@@ -25,3 +25,11 @@ class AppMgmtLocalizationChanged extends AppMgmtEvent {
 
   List<Object> get props => [locale];
 }
+
+class AppMgmtTabChanged extends AppMgmtEvent {
+  final int index;
+
+  AppMgmtTabChanged({required this.index}) : super();
+
+  List<Object> get props => [index];
+}
