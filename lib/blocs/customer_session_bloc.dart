@@ -50,7 +50,9 @@ class CustomerSessionBloc extends AbstractBloc<CustomerSessionEvent, CustomerSes
 
     CustomerSession customerSession = CustomerSession(ObjectId(), true, DateTime.now().toUtc(),
         displayName.elementAt(0), userInfo['uid'][0], displayName.elementAt(1),
-        code: "${userInfo['uid'][0]}-$formatted", currentProgress: "SELLING");
+        code: "${userInfo['uid'][0]}-$formatted",
+        currentProgress: "SELLING",
+        shoppingBag: ShoppingBag(ObjectId(), now, departmentCode: displayName.elementAt(0), items: []));
     await customerSessionRepository.createCustomerSession(customerSession);
     add(CustomerSessionInitialed());
   }

@@ -7,12 +7,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_deep_link/flutter_deep_link.dart';
 import 'package:mobile_poss_gp01/blocs/product_amount_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/product_info_bloc.dart';
+import 'package:mobile_poss_gp01/blocs/shopping_bag_bloc.dart';
 import 'package:mobile_poss_gp01/database_objects/product/pojo/product_amount.dart';
 import 'package:mobile_poss_gp01/database_objects/product/pojo/product_info.dart';
 import 'package:mobile_poss_gp01/database_objects/product/pojo/store_product.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/model/inventory.dart';
 import 'package:mobile_poss_gp01/events/product_amount_event.dart';
 import 'package:mobile_poss_gp01/events/product_info_event.dart';
+import 'package:mobile_poss_gp01/events/shopping_bag_event.dart';
 import 'package:mobile_poss_gp01/extension/string_extension.dart';
 import 'package:mobile_poss_gp01/mixins/common_function.dart';
 import 'package:mobile_poss_gp01/mixins/exception/handle_exception_event.dart';
@@ -24,12 +26,14 @@ import 'package:mobile_poss_gp01/resources/size_style.dart';
 import 'package:mobile_poss_gp01/routes/my_navigator.dart';
 import 'package:mobile_poss_gp01/states/product_amount_state.dart';
 import 'package:mobile_poss_gp01/states/product_info_state.dart';
+import 'package:mobile_poss_gp01/states/shopping_bag_state.dart';
 import 'package:mobile_poss_gp01/util/handle_price/handle_price.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/components/discount_tag_stateless_widget.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_alert_dialog_stateless_widget.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_text_shimmer_stateless_widget.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_text_stateless_widget.dart';
+import 'package:mobile_poss_gp01/widgets/containers/add_to_cart_dialog/animation_dialog.dart';
 import 'package:shimmer/shimmer.dart';
 
 /// 價格詳細 dialog
@@ -48,10 +52,11 @@ class AddToCartByStoreStatefulWidget extends StatefulWidget {
 class _AddToCartByStoreStatefulWidgetState extends State<AddToCartByStoreStatefulWidget>
     with CommonFunction, HandleExceptionEvent, SingleTickerProviderStateMixin {
   late final TextTheme _textTheme = Theme.of(context).textTheme;
-  late bool _isAddToCartLoading = false;
-  late bool _isProductStockLoading = false;
 
-  late bool _isInCart = false;
+  // late bool _isAddToCartLoading = false;
+  // late bool _isProductStockLoading = false;
+  //
+  // late bool _isInCart = false;
 
   @override
   void initState() {
@@ -383,88 +388,6 @@ class _AddToCartByStoreStatefulWidgetState extends State<AddToCartByStoreStatefu
                             ],
                           ),
                         )
-                        // BlocBuilder<ProductAmountBloc, ProductAmountState>(builder: (context, state) {
-                        //   return SizedBox(
-                        //     width: 150,
-                        //     child: Column(
-                        //       mainAxisAlignment: MainAxisAlignment.end,
-                        //       children: [
-                        //         Column(
-                        //             mainAxisAlignment: MainAxisAlignment.end,
-                        //             crossAxisAlignment: CrossAxisAlignment.end,
-                        //             children: [
-                        //               if (state is ProductAmountLoadInProgress) ...[
-                        //                 Padding(
-                        //                   padding: const EdgeInsets.only(bottom: SizeStyle.paddingUnit * 0.5),
-                        //                   child: Shimmer.fromColors(
-                        //                     baseColor: ColorStyle.shimmerBaseColor,
-                        //                     highlightColor: ColorStyle.shimmerHighlightColor,
-                        //                     child: Container(
-                        //                       width: 100,
-                        //                       color: ColorStyle.white,
-                        //                       child: Text('', style: _textTheme.displaySmall),
-                        //                     ),
-                        //                   ),
-                        //                 ),
-                        //                 Padding(
-                        //                   padding: const EdgeInsets.only(bottom: SizeStyle.paddingUnit * 0.5),
-                        //                   child: Shimmer.fromColors(
-                        //                     baseColor: ColorStyle.shimmerBaseColor,
-                        //                     highlightColor: ColorStyle.shimmerHighlightColor,
-                        //                     child: Container(
-                        //                       width: 100,
-                        //                       color: ColorStyle.white,
-                        //                       child: Text('', style: _textTheme.displaySmall),
-                        //                     ),
-                        //                   ),
-                        //                 )
-                        //               ],
-                        //               if (state is ProductAmountLoadSuccess) ...[
-                        //                 /* 優惠 label */
-                        //                 if ((state.productAmount?.selectedDiscount?.discountName ?? "").isNotEmpty)
-                        //                   DiscountTagStatelessWidget(
-                        //                       discountName: state.productAmount?.selectedDiscount?.discountName),
-                        //                 /* 貨牌價 */
-                        //                 Row(
-                        //                   mainAxisAlignment: MainAxisAlignment.end,
-                        //                   children: [
-                        //                     const MyTextStatelessWidget(
-                        //                         text: "RMB¥",
-                        //                         padding: EdgeInsets.only(right: SizeStyle.paddingUnit),
-                        //                         style: TextStyle(color: ColorStyle.grey)),
-                        //                     MyTextStatelessWidget(
-                        //                         text:
-                        //                             HandlePrice.formatPrice(state.productAmount?.inventoryAmount ?? 0),
-                        //                         style: TextStyle(
-                        //                             decoration: state.productAmount?.inventoryAmount != null &&
-                        //                                     state.productAmount?.netAmount != null &&
-                        //                                     (state.productAmount!.inventoryAmount! >
-                        //                                         state.productAmount!.netAmount!)
-                        //                                 ? TextDecoration.lineThrough
-                        //                                 : TextDecoration.none,
-                        //                             color: ColorStyle.grey)),
-                        //                   ],
-                        //                 ),
-                        //                 /* 約定售價 */
-                        //                 Row(
-                        //                   mainAxisAlignment: MainAxisAlignment.end,
-                        //                   children: [
-                        //                     const MyTextStatelessWidget(
-                        //                         text: "RMB¥",
-                        //                         padding: EdgeInsets.only(right: SizeStyle.paddingUnit),
-                        //                         style: TextStyle(color: ColorStyle.grey)),
-                        //                     MyTextStatelessWidget(
-                        //                       text: HandlePrice.formatPrice(state.productAmount?.netAmount ?? 0),
-                        //                       style: _textTheme.displaySmall,
-                        //                     ),
-                        //                   ],
-                        //                 )
-                        //               ]
-                        //             ])
-                        //       ],
-                        //     ),
-                        //   );
-                        // }),
                       ],
                     ),
                     bottomWidget: Row(
@@ -528,35 +451,71 @@ class _AddToCartByStoreStatefulWidgetState extends State<AddToCartByStoreStatefu
                             //           : const Icon(Icons.list),
                             //     ),
                             //   ),
-                            ElevatedButton(
-                              onPressed: !_isAddToCartLoading &&
-                                      !_isInCart &&
-                                      inventoryAmount != null &&
-                                      netAmount != null &&
-                                      widget.storeProduct.inventory?.inventoryStatus == null
-                                  ? _submitAddToCart
-                                  : null,
-                              child: _isAddToCartLoading
-                                  ? Container(
-                                      width: 24,
-                                      height: 24,
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: const CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 3,
-                                      ),
-                                    )
-                                  : Text(
-                                      _isInCart
-                                          ? "widget.addToCart.button.alreadyAddToCart".tr
-                                          : (inventoryAmount != null && netAmount != null)
-                                              ? widget.storeProduct.inventory?.inventoryStatus == null
-                                                  ? "widget.addToCart.button.addToCart".tr
-                                                  : "widget.addToCart.button.outOfStockItem".tr
-                                              : "widget.addToCart.button.noPriceInformation".tr,
-                                      style: _textTheme.titleLarge?.copyWith(color: ColorStyle.white)),
-                              style: ElevatedButton.styleFrom(minimumSize: SizeStyle.dialogButtonSize),
-                            ),
+                            // ElevatedButton(
+                            //   onPressed: !_isAddToCartLoading &&
+                            //           !_isInCart &&
+                            //           inventoryAmount != null &&
+                            //           netAmount != null &&
+                            //           widget.storeProduct.inventory?.inventoryStatus == null
+                            //       ? _submitAddToCart
+                            //       : null,
+                            //   child: _isAddToCartLoading
+                            //       ? Container(
+                            //           width: 24,
+                            //           height: 24,
+                            //           padding: const EdgeInsets.all(2.0),
+                            //           child: const CircularProgressIndicator(
+                            //             color: Colors.white,
+                            //             strokeWidth: 3,
+                            //           ),
+                            //         )
+                            //       : Text(
+                            //           _isInCart
+                            //               ? "widget.addToCart.button.alreadyAddToCart".tr
+                            //               : (inventoryAmount != null && netAmount != null)
+                            //                   ? widget.storeProduct.inventory?.inventoryStatus == null
+                            //                       ? "widget.addToCart.button.addToCart".tr
+                            //                       : "widget.addToCart.button.outOfStockItem".tr
+                            //                   : "widget.addToCart.button.noPriceInformation".tr,
+                            //           style: _textTheme.titleLarge?.copyWith(color: ColorStyle.white)),
+                            //   style: ElevatedButton.styleFrom(minimumSize: SizeStyle.dialogButtonSize),
+                            // ),
+
+                            if (productAmountState is ProductAmountLoadSuccess)
+                              BlocProvider<ShoppingBagBloc>(
+                                  create: (BuildContext context) => ShoppingBagBloc(
+                                      authenticationRepository: AuthenticationRepository(),
+                                      customerSessionRepository: CustomerSessionRepository()),
+                                  child: BlocListener<ShoppingBagBloc, ShoppingBagState>(listener:
+                                      (context, shoppingBagState) {
+                                    if (shoppingBagState is ShoppingBagItemAddFailure) {
+                                      showErrorSnackBar(context,
+                                          '${"product.widgets.factory.addToCartUnSuccessful".tr}! ${shoppingBagState.errorMessage}');
+                                    }
+
+                                    if (shoppingBagState is ShoppingBagItemAddSuccess) {
+                                      showSuccessSnackBar(
+                                          context, '${"product.widgets.factory.addToCartSuccessful".tr}!');
+                                      Navigator.of(context).pop(true);
+                                      showDialog(
+                                          barrierColor: Colors.transparent,
+                                          barrierDismissible: false,
+                                          context: context,
+                                          builder: (context) => const AnimationDialog());
+                                    }
+                                  }, child:
+                                      BlocBuilder<ShoppingBagBloc, ShoppingBagState>(builder: (context, shoppingState) {
+                                    return ElevatedButton(
+                                      onPressed: () {
+                                        context.read<ShoppingBagBloc>().add(ShoppingBagItemAdded(
+                                            productInfo: state.productInfo,
+                                            productAmount: productAmountState.productAmount!));
+                                      },
+                                      style: ElevatedButton.styleFrom(minimumSize: SizeStyle.dialogButtonSize),
+                                      child: Text("widget.addToCart.button.addToCart".tr,
+                                          style: _textTheme.titleLarge?.copyWith(color: ColorStyle.white)),
+                                    );
+                                  }))),
                           ],
                         )
                       ],

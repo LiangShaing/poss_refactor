@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:mobile_poss_gp01/data_provider/customer_session_data_provider.dart';
+import 'package:mobile_poss_gp01/data_provider/shopping_bag_data_provider.dart';
 import 'package:mobile_poss_gp01/database_objects/user/pojo/employee_pojo.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/model/customer_session.dart';
 import 'package:realm/realm.dart';
@@ -8,6 +9,7 @@ import 'package:collection/collection.dart';
 
 class CustomerSessionRepository {
   CustomerSessionDataProvider dataProvider = CustomerSessionDataProvider();
+  ShoppingBagDataProvider  shoppingBagDataProvider = ShoppingBagDataProvider();
   StreamSubscription? _realmCustomerSessionResultsStream;
   RealmResults<CustomerSession>? customerSessionResults;
 
@@ -34,5 +36,13 @@ class CustomerSessionRepository {
 
   CustomerSession? currentCustomerSession(Employee employee) {
     return dataProvider.findCurrentCustomerSessionByEmployee(employee).lastOrNull;
+  }
+
+  Future<void> createBrowsingHistories(CustomerSession customerSession, BrowsingHistories browsingHistories) async {
+    dataProvider.createBrowsingHistories(customerSession, browsingHistories);
+  }
+
+  Future<void> addItemToShoppingBag(CustomerSession customerSession, ShoppingBagItem shoppingBagItem) async {
+    shoppingBagDataProvider.addItemToShoppingBag(customerSession, shoppingBagItem);
   }
 }

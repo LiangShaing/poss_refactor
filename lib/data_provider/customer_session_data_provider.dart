@@ -26,4 +26,10 @@ class CustomerSessionDataProvider extends RealmDataProvider {
       customerSession.checkInIndicator = false;
     });
   }
+
+  Future<void> createBrowsingHistories(CustomerSession customerSession, BrowsingHistories browsingHistories) async {
+    realmSyncDao.realm.write(() {
+      customerSession.browsingHistories.add(browsingHistories);
+    });
+  }
 }
