@@ -30,6 +30,7 @@ import 'package:mobile_poss_gp01/states/product_state.dart';
 import 'package:mobile_poss_gp01/states/realm_mgmt_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_text_stateless_widget.dart';
+import 'package:mobile_poss_gp01/widgets/containers/add_to_cart_dialog/add_to_cart_by_store_stateful_widget.dart';
 
 class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
   final bool isShowBack;
@@ -185,6 +186,17 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
                                 ),
                                 content: Center(child: Text(state.errorMessage)),
                               ));
+                            } else if (state is ProductStoreLoadSuccess) {
+                              showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (_) =>
+                                      AddToCartByStoreStatefulWidget(productInfo: state.productInfo));
+                            } else if (state is ProductRemotedLoadSuccess) {
+                              // showMyDialogWithScaffold(
+                              //     context: context,
+                              //     barrierDismissible: false,
+                              //     body: AddToCartByRemotedStatefulWidget(productInfoRes: _productInfoRes));
                             }
                           },
                           child: BlocBuilder<ProductBloc, ProductState>(

@@ -1,14 +1,18 @@
+import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_poss_gp01/blocs/realm_bloc.dart';
-import 'package:mobile_poss_gp01/database_objects/product/pojo/store_product_info.dart';
+import 'package:mobile_poss_gp01/database_objects/product/pojo/product_info.dart';
+import 'package:mobile_poss_gp01/database_objects/product/pojo/store_product.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/model/realm_models.dart';
 import 'package:mobile_poss_gp01/database_objects/user/pojo/employee_pojo.dart';
+import 'package:mobile_poss_gp01/enum/sale_type.dart';
 import 'package:mobile_poss_gp01/events/product_event.dart';
 import 'package:mobile_poss_gp01/extension/string_extension.dart';
 import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
 import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
 import 'package:mobile_poss_gp01/repositories/product_repository.dart';
 import 'package:mobile_poss_gp01/resources/static_values.dart';
+import 'package:mobile_poss_gp01/services/product/product_service.dart';
 import 'package:mobile_poss_gp01/states/product_state.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
 import 'package:realm/realm.dart';
@@ -33,7 +37,7 @@ class ProductBloc extends AbstractBloc<ProductEvent, ProductState> {
     String catalogItemCode;
     Earmark? earmark;
 
-    StoreProductInfo storeProductInfo;
+    StoreProduct storeProduct;
     Map<String, dynamic> userInfo = await authenticationRepository.getTokenInfo();
     List<String> displayName = userInfo['displayName'].toString().split(" ");
     Employee employee = Employee(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), []);
@@ -48,6 +52,7 @@ class ProductBloc extends AbstractBloc<ProductEvent, ProductState> {
         null) {
       Logger.debug(message: "ProductBloc currentCustomerSession is empty");
       emit(ProductLoadFailure("widget.showAddToCartDialog.message.createdCustomerSession".tr));
+      return;
     }
 
     if (isCatalogItemCode) {
@@ -61,32 +66,170 @@ class ProductBloc extends AbstractBloc<ProductEvent, ProductState> {
         throw RealmException("findProductBySearchText productItem not found in earmark");
       } else {
         Logger.info(message: "found productItem in earmark $earmark");
-        storeProductInfo = StoreProductInfo(earmark: earmark);
+        storeProduct = StoreProduct(earmark: earmark);
       }
     } else {
       /* inventoryId or itemNumber */
       Logger.info(message: "search text $searchText is inventoryId or itemNumber");
-      storeProductInfo = productRepository.getProductItemByItemNumberOrInventoryId(searchText, employee);
+      storeProduct = productRepository.getProductItemByItemNumberOrInventoryId(searchText, employee);
 
-      if (!storeProductInfo.isInStore && storeProductInfo.earmark == null) {
+      if (!storeProduct.isInStore && storeProduct.earmark == null) {
         /* 不在本店也不在earmark */
         throw RealmException("findProductBySearchText productItem not found");
       }
-      catalogItemCode = storeProductInfo.inventory!.catalogItem!;
+      catalogItemCode = storeProduct.inventory!.catalogItem!;
     }
 
     /* 本店catalogItem商品 */
-    List<StoreProductInfo> storeCatalogItems =
+    List<StoreProduct> storeCatalogItems =
         productRepository.getProductItemFromStoreByCatalogItem(catalogItemCode, employee);
-    storeProductInfo.storeCatalogItems = storeCatalogItems;
+    storeProduct.storeCatalogItems = storeCatalogItems;
 
-    if (storeProductInfo.isInStore) {
+    if (storeProduct.isInStore) {
       Logger.debug(message: "ProductStoreLoadSuccess");
-      emit(ProductStoreLoadSuccess());
+      emit(ProductStoreLoadSuccess(_processProductDataFromStore(storeProduct)));
     } else {
       Logger.debug(message: "ProductRemotedLoadSuccess");
       emit(ProductRemotedLoadSuccess());
     }
+  }
+
+  ProductInfo _processProductDataFromStore(StoreProduct storeProduct) {
+    ProductService productService = ProductService();
+    CatalogItem? catalogItem = storeProduct.catalogItem;
+    Model? model = storeProduct.model;
+    Inventory? inventory = storeProduct.inventory;
+
+    String? inventoryId;
+    double? laborCost;
+    double? modelSequenceNumber;
+    String? itemNumber;
+    String? catalogItemCode;
+
+    String brand;
+    String collection;
+    String subCollection;
+    bool? fixedPriceIndicator;
+    double? grossWeight;
+    List<String> imagesPath = [];
+    String saleType = SaleType.inStore.value;
+    double? physicalWeightGram;
+    double? caratWeight;
+    String? color;
+    String? clarity;
+    String? cutGrade;
+    String? productName;
+    String? usageReferenceCode;
+    String? sizeAndLength;
+    /* 本店 */
+    inventoryId = inventory!.inventoryId;
+    fixedPriceIndicator = model?.fixedPriceIndicator;
+    /* 計價商品工費 取inventory price */
+    laborCost = (fixedPriceIndicator ?? true) ? inventory.laborCost : inventory.price;
+    modelSequenceNumber = model?.modelSequenceNumber;
+    itemNumber = inventory.itemNumber;
+    catalogItemCode = catalogItem?.catalogItem;
+
+    //TODO: 先註解從staticReferenceExt取名稱
+    productName = [
+      catalogItem?.goldType?.zhCN ?? "",
+      catalogItem?.materialCategory?.zhCN ?? "",
+      catalogItem?.usage?.zhCN ?? ""
+    ].where((e) => e.isNotEmpty).join(" ");
+    // productName = IndexPageState.prodService
+    //     .getStoreProductName(productInfoRes.catalogItem!)
+    //     .where((e) => e.isNotEmpty)
+    //     .join(" ");
+
+    brand = catalogItem?.brand?.zhCN ?? "";
+    collection = catalogItem?.collection?.zhCN ?? "";
+    subCollection = catalogItem?.subCollection?.zhCN ?? "";
+    grossWeight = inventory.grossWeight?.gram;
+    physicalWeightGram = inventory.physicalWeight?.gram;
+    List<ProductBom> productBomList = inventory.bom
+        .where((e) => e.mainMaterialIndicator)
+        .map((e) => ProductBom(
+            caratWeight: e.caratWeight,
+            color: e.diamondColor?.zhCN,
+            clarity: e.diamondClarity?.referenceCode,
+            cutGrade: e.diamondCutGrade?.zhCN,
+            bomCertificates: e.bomCertificates
+                .map((s) => ProductBomCertificate(
+                    physicalCertificateIndicator: s.physicalCertificateIndicator ?? "",
+                    certificateOrganization: s.certificateOrganization ?? "",
+                    certificateNumber: s.certificateNumber ?? "",
+                    reportPdfPath: s.reportPdfPath,
+                    digitalCardPath: s.digitalCardPath))
+                .toList()))
+        .toList();
+    // caratWeight = bom?.caratWeight;
+    // color = bom?.diamondColor?.zhCN;
+    // clarity = bom?.diamondClarity?.referenceCode;
+    // cutGrade = bom?.diamondCutGrade?.zhCN;
+    usageReferenceCode = catalogItem?.usage?.referenceCode;
+
+    sizeAndLength = productService.getProductSizeAndLength(usageReferenceCode ?? "", model?.length?.referenceCode ?? "",
+        model?.ringSize?.referenceCode ?? "", catalogItem?.earringsType.firstOrNull?.zhCN ?? "");
+
+    String? finalBrandCollection;
+    String? finalCollection;
+
+    if (brand.isNotEmpty) {
+      finalBrandCollection = brand;
+    } else if (brand.isEmpty && collection.isNotEmpty) {
+      finalBrandCollection = collection;
+    }
+
+    if (finalBrandCollection == collection) {
+      finalCollection = subCollection;
+    } else {
+      if (collection.isNotEmpty) {
+        finalCollection = collection;
+      } else if (collection.isEmpty && subCollection.isNotEmpty) {
+        finalCollection = subCollection;
+      }
+    }
+
+    ProductInfo info = ProductInfo(
+      catalogItemCode: catalogItemCode,
+      productName: productName,
+      finalBrandCollection: finalBrandCollection,
+      finalCollection: finalCollection,
+      fixedPriceIndicator: fixedPriceIndicator!,
+      modelSequenceNumber: modelSequenceNumber,
+      inventoryId: inventoryId,
+      itemNumber: itemNumber,
+      usageCode: usageReferenceCode,
+      // netAmount: productAmountPOJO.netAmount,
+      // inventoryAmount: productAmountPOJO.inventoryAmount,
+      // discounts: _discounts,
+      // selectedProductDiscount: ProductDiscount(
+      //   _selectedDiscount?.projectLineId ?? "",
+      //   _selectedDiscount?.discountName ?? "",
+      //   _selectedDiscount?.agreePrice ?? 0,
+      // ),
+      saleType: saleType,
+      // brand: ,
+
+      // subCollection: CatalogItemTitle(name: subCollection),
+      // goldPrice: productAmountPOJO.goldPrice,
+      // fixedPriceIndicator: fixedPriceIndicator,
+      bookingUnit: ProductBookingUnit(
+          cbu: ProductCbu(inventoryId: inventoryId),
+          modelSequenceNumber: modelSequenceNumber,
+          laborCost: laborCost,
+          grossWeightGram: grossWeight,
+          physicalWeightGram: physicalWeightGram,
+          caratWeight: caratWeight,
+          color: color,
+          clarity: clarity,
+          cutGrade: cutGrade,
+          size: sizeAndLength,
+          bom: productBomList),
+      // imagesPath: imagesPath,
+    );
+
+    return info;
   }
 
 // Earmark? _getEarmarkByCatalogItem(String catalogItem) {

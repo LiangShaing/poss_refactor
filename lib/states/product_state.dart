@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:mobile_poss_gp01/database_objects/product/pojo/product_info.dart';
+import 'package:mobile_poss_gp01/database_objects/product/pojo/store_product.dart';
 
 abstract class ProductState<T> extends Equatable {
   const ProductState();
@@ -15,6 +17,10 @@ class ProductLoadInitial extends ProductState {
 }
 
 class ProductStoreLoadSuccess extends ProductState {
+  final ProductInfo productInfo;
+
+  const ProductStoreLoadSuccess(this.productInfo);
+
   @override
   List<Object> get props => [];
 }
