@@ -16,8 +16,13 @@ class ProductInfo {
   String? usageDescription;
   String? usageCode;
   double? standardSpecificationPhysicalWeightLowerBound;
+  double? price;
 
   ProductBookingUnit? bookingUnit;
+  String? pricingType;
+  String? declareMaterial;
+  String? usage;
+  String? goldType;
 
   ProductInfo(
       {this.catalogItemCode,
@@ -37,7 +42,12 @@ class ProductInfo {
       this.usageDescription,
       this.usageCode,
       this.standardSpecificationPhysicalWeightLowerBound,
-      this.bookingUnit});
+      this.bookingUnit,
+      this.price,
+      this.pricingType,
+      this.declareMaterial,
+      this.usage,
+      this.goldType});
 
   ProductInfo.clone(ProductInfo ori)
       : this(
@@ -58,7 +68,12 @@ class ProductInfo {
             usageDescription: ori.usageDescription,
             usageCode: ori.usageCode,
             standardSpecificationPhysicalWeightLowerBound: ori.standardSpecificationPhysicalWeightLowerBound,
-            bookingUnit: ori.bookingUnit);
+            bookingUnit: ori.bookingUnit,
+            price: ori.price,
+            pricingType: ori.pricingType,
+            declareMaterial: ori.declareMaterial,
+            usage: ori.usage,
+            goldType: ori.goldType);
 }
 
 class ProductBookingUnit {

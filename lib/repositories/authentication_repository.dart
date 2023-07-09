@@ -1,4 +1,5 @@
 import 'package:mobile_poss_gp01/data_provider/authentication_data_provider.dart';
+import 'package:mobile_poss_gp01/database_objects/user/pojo/employee_pojo.dart';
 
 class AuthenticationRepository {
   AuthenticationDataProvider authenticationDataProvider = AuthenticationDataProvider.instance();
@@ -11,7 +12,7 @@ class AuthenticationRepository {
     return authenticationDataProvider.getOauthURL();
   }
 
-  String getLogoutURL(){
+  String getLogoutURL() {
     return authenticationDataProvider.getLogoutURL();
   }
 
@@ -23,7 +24,7 @@ class AuthenticationRepository {
     return authenticationDataProvider.getUserId();
   }
 
-  Future<Map<String, dynamic>> getTokenInfo(){
+  Future<Map<String, dynamic>> getTokenInfo() {
     return authenticationDataProvider.getTokenInfo();
   }
 
@@ -31,13 +32,17 @@ class AuthenticationRepository {
     return authenticationDataProvider.cleanOauth();
   }
 
-  Future<bool> execRefreshToken(){
+  Future<bool> execRefreshToken() {
     return authenticationDataProvider.execRefreshToken();
   }
 
-  Future<bool> userVerified(String userId, String password){
+  Future<bool> userVerified(String userId, String password) {
     return authenticationDataProvider.userVerified(userId, password);
   }
 
-
+  Future<Employee> getEmployee() async {
+    Map<String, dynamic> userInfo = await authenticationDataProvider.getTokenInfo();
+    List<String> displayName = userInfo['displayName'].toString().split(" ");
+    return Employee(displayName.elementAt(1), userInfo['uid'][0], displayName.elementAt(0), []);
+  }
 }

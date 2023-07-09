@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:mobile_poss_gp01/database_objects/product/pojo/product_amount.dart';
 import 'package:mobile_poss_gp01/database_objects/product/pojo/product_info.dart';
 import 'package:mobile_poss_gp01/database_objects/product/pojo/store_product.dart';
 
@@ -22,7 +23,7 @@ class ProductStoreLoadSuccess extends ProductState {
   const ProductStoreLoadSuccess(this.productInfo);
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class ProductRemotedLoadSuccess extends ProductState {

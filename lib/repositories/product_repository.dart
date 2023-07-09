@@ -1,3 +1,4 @@
+import 'package:chowsangsang_enterprise_portal/service_factory.dart' hide Employee;
 import 'package:mobile_poss_gp01/data_provider/product_data_provider.dart';
 import 'package:mobile_poss_gp01/database_objects/product/pojo/store_product.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/model/realm_models.dart';
@@ -49,5 +50,15 @@ class ProductRepository {
     }
 
     return result;
+  }
+
+  Future<PossGoldPriceRes> getGoldPrice(List<String> actions, List<String> pricingTypes, List<String> declaredMaterials,
+      List<String> usages, List<String> goldTypes) {
+    return dataProvider.getGoldPrice(actions, pricingTypes, declaredMaterials, usages, goldTypes);
+  }
+
+  Future<PossProductDiscountCalculateRes> postProductDiscountCalculate(
+      {required List<PossProductDiscountCalculateReqProduct> products, String? customerId, String? ecouponCode}) {
+    return dataProvider.postProductDiscountCalculate(products: products);
   }
 }

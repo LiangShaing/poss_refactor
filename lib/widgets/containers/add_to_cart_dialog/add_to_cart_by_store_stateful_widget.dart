@@ -3,18 +3,30 @@ import 'dart:io';
 import 'package:chowsangsang_enterprise_portal/service_factory.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_deep_link/flutter_deep_link.dart';
+import 'package:mobile_poss_gp01/blocs/product_amount_bloc.dart';
+import 'package:mobile_poss_gp01/database_objects/product/pojo/product_amount.dart';
 import 'package:mobile_poss_gp01/database_objects/product/pojo/product_info.dart';
 import 'package:mobile_poss_gp01/database_objects/product/pojo/store_product.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/model/inventory.dart';
+import 'package:mobile_poss_gp01/events/product_amount_event.dart';
 import 'package:mobile_poss_gp01/extension/string_extension.dart';
 import 'package:mobile_poss_gp01/mixins/common_function.dart';
+import 'package:mobile_poss_gp01/mixins/exception/handle_exception_event.dart';
+import 'package:mobile_poss_gp01/repositories/authentication_repository.dart';
+import 'package:mobile_poss_gp01/repositories/customer_session_repository.dart';
+import 'package:mobile_poss_gp01/repositories/product_repository.dart';
 import 'package:mobile_poss_gp01/resources/color_style.dart';
 import 'package:mobile_poss_gp01/resources/size_style.dart';
+import 'package:mobile_poss_gp01/states/product_amount_state.dart';
+import 'package:mobile_poss_gp01/util/handle_price/handle_price.dart';
 import 'package:mobile_poss_gp01/util/logger/logger.dart';
+import 'package:mobile_poss_gp01/widgets/components/discount_tag_stateless_widget.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_alert_dialog_stateless_widget.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_text_shimmer_stateless_widget.dart';
 import 'package:mobile_poss_gp01/widgets/components/my_text_stateless_widget.dart';
+import 'package:shimmer/shimmer.dart';
 
 /// 價格詳細 dialog
 class AddToCartByStoreStatefulWidget extends StatefulWidget {
@@ -30,7 +42,7 @@ class AddToCartByStoreStatefulWidget extends StatefulWidget {
 }
 
 class _AddToCartByStoreStatefulWidgetState extends State<AddToCartByStoreStatefulWidget>
-    with CommonFunction, SingleTickerProviderStateMixin {
+    with CommonFunction, HandleExceptionEvent, SingleTickerProviderStateMixin {
   bool selected = false;
 
   /* 貨品名稱 */
@@ -252,34 +264,204 @@ class _AddToCartByStoreStatefulWidgetState extends State<AddToCartByStoreStatefu
             ),
           ),
           /* 價格 */
-          // SizedBox(
-          //   width: 150,
-          //   child: Column(
-          //     mainAxisAlignment: MainAxisAlignment.end,
-          //     children: [
-          //       Column(
+          BlocProvider<ProductAmountBloc>(
+              create: (BuildContext context) => ProductAmountBloc(
+                  productRepository: ProductRepository(),
+                  authenticationRepository: AuthenticationRepository(),
+                  customerSessionRepository: CustomerSessionRepository())
+                ..add(ProductAmountFetched(productInfo: widget.productInfo)),
+              child: BlocListener<ProductAmountBloc, ProductAmountState>(
+                listener: (context, state) {
+                  if (state is ProductAmountLoadFailure) {
+                    handleException(state.exception, context,
+                        eventName: "AddToCartStatelessWidget ProductAmountLoadFailure");
+                  }
+                },
+                child: BlocBuilder<ProductAmountBloc, ProductAmountState>(builder: (context, state) {
+                  return SizedBox(
+                    width: 150,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              if (state is ProductAmountLoadInProgress) ...[
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: SizeStyle.paddingUnit * 0.5),
+                                  child: Shimmer.fromColors(
+                                    baseColor: ColorStyle.shimmerBaseColor,
+                                    highlightColor: ColorStyle.shimmerHighlightColor,
+                                    child: Container(
+                                      width: 100,
+                                      color: ColorStyle.white,
+                                      child: Text('', style: _textTheme.displaySmall),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: SizeStyle.paddingUnit * 0.5),
+                                  child: Shimmer.fromColors(
+                                    baseColor: ColorStyle.shimmerBaseColor,
+                                    highlightColor: ColorStyle.shimmerHighlightColor,
+                                    child: Container(
+                                      width: 100,
+                                      color: ColorStyle.white,
+                                      child: Text('', style: _textTheme.displaySmall),
+                                    ),
+                                  ),
+                                )
+                              ],
+                              if (state is ProductAmountLoadSuccess) ...[
+                                /* 優惠 label */
+                                if ((state.productAmount?.selectedDiscount?.discountName ?? "").isNotEmpty)
+                                  DiscountTagStatelessWidget(
+                                      discountName: state.productAmount?.selectedDiscount?.discountName),
+                                /* 貨牌價 */
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    const MyTextStatelessWidget(
+                                        text: "RMB¥",
+                                        padding: EdgeInsets.only(right: SizeStyle.paddingUnit),
+                                        style: TextStyle(color: ColorStyle.grey)),
+                                    MyTextStatelessWidget(
+                                        text: HandlePrice.formatPrice(state.productAmount?.inventoryAmount ?? 0),
+                                        style: TextStyle(
+                                            decoration: state.productAmount?.inventoryAmount != null &&
+                                                    state.productAmount?.netAmount != null &&
+                                                    (state.productAmount!.inventoryAmount! >
+                                                        state.productAmount!.netAmount!)
+                                                ? TextDecoration.lineThrough
+                                                : TextDecoration.none,
+                                            color: ColorStyle.grey)),
+                                  ],
+                                ),
+                                /* 約定售價 */
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    const MyTextStatelessWidget(
+                                        text: "RMB¥",
+                                        padding: EdgeInsets.only(right: SizeStyle.paddingUnit),
+                                        style: TextStyle(color: ColorStyle.grey)),
+                                    MyTextStatelessWidget(
+                                      text: HandlePrice.formatPrice(state.productAmount?.netAmount ?? 0),
+                                      style: _textTheme.displaySmall,
+                                    ),
+                                  ],
+                                )
+                              ]
+                            ])
+                      ],
+                    ),
+                  );
+                }),
+              )),
+
+          // BlocBuilder<ProductAmountBloc, ProductAmountState>(
+          //     bloc: ProductAmountBloc(
+          //         productRepository: ProductRepository(),
+          //         authenticationRepository: AuthenticationRepository(),
+          //         customerSessionRepository: CustomerSessionRepository())
+          //       ..add(ProductAmountFetched(productInfo: widget.productInfo)),
+          //     builder: (context, state) {
+          //       return SizedBox(
+          //         width: 150,
+          //         child: Column(
           //           mainAxisAlignment: MainAxisAlignment.end,
-          //           crossAxisAlignment: CrossAxisAlignment.end,
           //           children: [
-          //             /* 優惠 label */
-          //             if ((_productAmountPOJO?.selectedDiscount?.discountName ?? "").isNotEmpty)
-          //               DiscountTagStatelessWidget(
-          //                   discountName: _productAmountPOJO?.selectedDiscount?.discountName),
+          //             Column(
+          //                 mainAxisAlignment: MainAxisAlignment.end,
+          //                 crossAxisAlignment: CrossAxisAlignment.end,
+          //                 children: [
           //
-          //             /* 貨牌價 */
-          //             _factory.getInventoryAmount().render(context, _inventoryAmount,
-          //                 decoration:
-          //                 _inventoryAmount != null && _netAmount != null && (_inventoryAmount > _netAmount)
-          //                     ? TextDecoration.lineThrough
-          //                     : TextDecoration.none),
           //
-          //             /* 約定售價 */
-          //             _factory.getNetAmount().render(context, _netAmount,
-          //                 labelStyle: _textTheme.titleMedium, valueStyle: _textTheme.displaySmall),
-          //           ])
-          //     ],
-          //   ),
-          // )
+          //                   if (state is ProductAmountLoadInProgress) ...[
+          //                     Padding(
+          //                       padding: const EdgeInsets.only(bottom: SizeStyle.paddingUnit * 0.5),
+          //                       child: Shimmer.fromColors(
+          //                         baseColor: ColorStyle.shimmerBaseColor,
+          //                         highlightColor: ColorStyle.shimmerHighlightColor,
+          //                         child: Container(
+          //                           width: 100,
+          //                           color: ColorStyle.white,
+          //                           child: Text('', style: _textTheme.displaySmall),
+          //                         ),
+          //                       ),
+          //                     ),
+          //                     Padding(
+          //                       padding: const EdgeInsets.only(bottom: SizeStyle.paddingUnit * 0.5),
+          //                       child: Shimmer.fromColors(
+          //                         baseColor: ColorStyle.shimmerBaseColor,
+          //                         highlightColor: ColorStyle.shimmerHighlightColor,
+          //                         child: Container(
+          //                           width: 100,
+          //                           color: ColorStyle.white,
+          //                           child: Text('', style: _textTheme.displaySmall),
+          //                         ),
+          //                       ),
+          //                     )
+          //                   ],
+          //                   if (state is ProductAmountLoadSuccess) ...[
+          //                     /* 優惠 label */
+          //                     if ((state.productAmount?.selectedDiscount?.discountName ?? "").isNotEmpty)
+          //                       DiscountTagStatelessWidget(
+          //                           discountName: state.productAmount?.selectedDiscount?.discountName),
+          //                     /* 貨牌價 */
+          //                     Row(
+          //                       mainAxisAlignment: MainAxisAlignment.end,
+          //                       children: [
+          //                         const MyTextStatelessWidget(
+          //                             text: "RMB¥",
+          //                             padding: EdgeInsets.only(right: SizeStyle.paddingUnit),
+          //                             style: TextStyle(color: ColorStyle.grey)),
+          //                         MyTextStatelessWidget(
+          //                             text: HandlePrice.formatPrice(state.productAmount?.inventoryAmount ?? 0),
+          //                             style: TextStyle(
+          //                                 decoration: state.productAmount?.inventoryAmount != null &&
+          //                                         state.productAmount?.netAmount != null &&
+          //                                         (state.productAmount!.inventoryAmount! >
+          //                                             state.productAmount!.netAmount!)
+          //                                     ? TextDecoration.lineThrough
+          //                                     : TextDecoration.none,
+          //                                 color: ColorStyle.grey)),
+          //                       ],
+          //                     ),
+          //                     /* 約定售價 */
+          //                     Row(
+          //                       mainAxisAlignment: MainAxisAlignment.end,
+          //                       children: [
+          //                         const MyTextStatelessWidget(
+          //                             text: "RMB¥",
+          //                             padding: EdgeInsets.only(right: SizeStyle.paddingUnit),
+          //                             style: TextStyle(color: ColorStyle.grey)),
+          //                         MyTextStatelessWidget(
+          //                           text: HandlePrice.formatPrice(state.productAmount?.netAmount ?? 0),
+          //                           style: _textTheme.displaySmall,
+          //                         ),
+          //                       ],
+          //                     )
+          //                   ]
+          //                   // MyTextStatelessWidget(
+          //                   //     text: state.productAmount?.inventoryAmount?.round().toString(),
+          //                   //     style: _textTheme.titleLarge)
+          //
+          //                   // _factory.getInventoryAmount().render(context, _inventoryAmount,
+          //                   //     decoration:
+          //                   //     _inventoryAmount != null && _netAmount != null && (_inventoryAmount > _netAmount)
+          //                   //         ? TextDecoration.lineThrough
+          //                   //         : TextDecoration.none),
+          //
+          //                   /* 約定售價 */
+          //                   // _factory.getNetAmount().render(context, _netAmount,
+          //                   //     labelStyle: _textTheme.titleMedium, valueStyle: _textTheme.displaySmall),
+          //                 ])
+          //           ],
+          //         ),
+          //       );
+          //     })
         ],
       ),
       bottomWidget: Row(
