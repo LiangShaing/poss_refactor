@@ -192,7 +192,7 @@ class MyAppBarStatelessWidget extends StatelessWidget implements PreferredSize {
                                   context: context,
                                   barrierDismissible: false,
                                   builder: (_) =>
-                                      AddToCartByStoreStatefulWidget(productInfo: state.productInfo));
+                                      AddToCartByStoreStatefulWidget(storeProduct: state.storeProduct));
                             } else if (state is ProductRemotedLoadSuccess) {
                               _searchController.clear();
                               // showMyDialogWithScaffold(

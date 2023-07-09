@@ -18,9 +18,10 @@ class ProductLoadInitial extends ProductState {
 }
 
 class ProductStoreLoadSuccess extends ProductState {
-  final ProductInfo productInfo;
+  // final ProductInfo productInfo;
+  final StoreProduct storeProduct;
 
-  const ProductStoreLoadSuccess(this.productInfo);
+  const ProductStoreLoadSuccess(this.storeProduct);
 
   @override
   List<Object?> get props => [];

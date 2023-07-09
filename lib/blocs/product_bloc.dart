@@ -48,6 +48,7 @@ class ProductBloc extends AbstractBloc<ProductEvent, ProductState> {
     if (searchText.length < 8) {
       Logger.debug(message: "ProductBloc _itemFetched searchText.length < 8");
       emit(const ProductLoadFailure("輸入內容不得小於8碼"));
+      return;
     }
 
     if (customerSessionRepository.currentCustomerSession(employee) == null) {
@@ -64,7 +65,8 @@ class ProductBloc extends AbstractBloc<ProductEvent, ProductState> {
       earmark = productRepository.findEarmarkByCatalogItem(searchText);
 
       if (earmark == null) {
-        throw RealmException("findProductBySearchText productItem not found in earmark");
+        emit(const ProductLoadFailure("查無此商品"));
+        return;
       } else {
         Logger.info(message: "found productItem in earmark $earmark");
         storeProduct = StoreProduct(earmark: earmark);
@@ -76,7 +78,8 @@ class ProductBloc extends AbstractBloc<ProductEvent, ProductState> {
 
       if (!storeProduct.isInStore && storeProduct.earmark == null) {
         /* 不在本店也不在earmark */
-        throw RealmException("findProductBySearchText productItem not found");
+        emit(const ProductLoadFailure("查無此商品"));
+        return;
       }
       catalogItemCode = storeProduct.inventory!.catalogItem!;
     }
@@ -88,8 +91,8 @@ class ProductBloc extends AbstractBloc<ProductEvent, ProductState> {
 
     if (storeProduct.isInStore) {
       Logger.debug(message: "ProductStoreLoadSuccess");
-      ProductInfo productInfo = _processProductDataFromStore(storeProduct);
-      emit(ProductStoreLoadSuccess(productInfo));
+      // ProductInfo productInfo = _processProductDataFromStore(storeProduct);
+      emit(ProductStoreLoadSuccess(storeProduct));
       // //取得金額
       // try {
       //   ProductAmount productAmount = await getStoreProductAmount(storeProduct);
@@ -101,222 +104,140 @@ class ProductBloc extends AbstractBloc<ProductEvent, ProductState> {
     }
   }
 
-  ProductInfo _processProductDataFromStore(StoreProduct storeProduct) {
-    ProductService productService = ProductService();
-    CatalogItem? catalogItem = storeProduct.catalogItem;
-    Model? model = storeProduct.model;
-    Inventory? inventory = storeProduct.inventory;
-
-    String pricingType = catalogItem?.pricingType ?? "";
-    String declareMaterial = catalogItem?.declaredMaterial?.referenceCode ?? '';
-    String usage = model?.usage?.referenceCode ?? '';
-    String goldType = catalogItem?.goldType?.referenceCode ?? '';
-
-    String? inventoryId = inventory!.inventoryId;
-    bool? fixedPriceIndicator = model?.fixedPriceIndicator;
-    /* 計價商品工費 取inventory price */
-    int? laborCost = (fixedPriceIndicator ?? true) ? inventory.laborCost.round() : inventory.price.round();
-    double? modelSequenceNumber = model?.modelSequenceNumber;
-    String? itemNumber = inventory.itemNumber;
-    String? catalogItemCode = catalogItem?.catalogItem;
-    double? price = inventory.price;
-    String brand = catalogItem?.brand?.zhCN ?? "";
-    String collection = catalogItem?.collection?.zhCN ?? "";
-    String subCollection = catalogItem?.subCollection?.zhCN ?? "";
-
-    double? grossWeight = inventory.grossWeight?.gram;
-    List<String> imagesPath = [];
-    String saleType = SaleType.inStore.value;
-    double? physicalWeightGram = inventory.physicalWeight?.gram;
-    // double? caratWeight;
-    // String? color;
-    // String? clarity;
-    // String? cutGrade;
-    String? usageReferenceCode = catalogItem?.usage?.referenceCode;
-    String? sizeAndLength = productService.getProductSizeAndLength(
-        usageReferenceCode ?? "",
-        model?.length?.referenceCode ?? "",
-        model?.ringSize?.referenceCode ?? "",
-        catalogItem?.earringsType.firstOrNull?.zhCN ?? "");
-
-    //TODO: 先註解從staticReferenceExt取名稱
-    String? productName = [
-      catalogItem?.goldType?.zhCN ?? "",
-      catalogItem?.materialCategory?.zhCN ?? "",
-      catalogItem?.usage?.zhCN ?? ""
-    ].where((e) => e.isNotEmpty).join(" ");
-    // productName = IndexPageState.prodService
-    //     .getStoreProductName(productInfoRes.catalogItem!)
-    //     .where((e) => e.isNotEmpty)
-    //     .join(" ");
-
-    List<ProductBom> productBomList = inventory.bom
-        .where((e) => e.mainMaterialIndicator)
-        .map((e) => ProductBom(
-            caratWeight: e.caratWeight,
-            color: e.diamondColor?.zhCN,
-            clarity: e.diamondClarity?.referenceCode,
-            cutGrade: e.diamondCutGrade?.zhCN,
-            bomCertificates: e.bomCertificates
-                .map((s) => ProductBomCertificate(
-                    physicalCertificateIndicator: s.physicalCertificateIndicator ?? "",
-                    certificateOrganization: s.certificateOrganization ?? "",
-                    certificateNumber: s.certificateNumber ?? "",
-                    reportPdfPath: s.reportPdfPath,
-                    digitalCardPath: s.digitalCardPath))
-                .toList()))
-        .toList();
-    // caratWeight = bom?.caratWeight;
-    // color = bom?.diamondColor?.zhCN;
-    // clarity = bom?.diamondClarity?.referenceCode;
-    // cutGrade = bom?.diamondCutGrade?.zhCN;
-
-    String? finalBrandCollection;
-    String? finalCollection;
-
-    if (brand.isNotEmpty) {
-      finalBrandCollection = brand;
-    } else if (brand.isEmpty && collection.isNotEmpty) {
-      finalBrandCollection = collection;
-    }
-
-    if (finalBrandCollection == collection) {
-      finalCollection = subCollection;
-    } else {
-      if (collection.isNotEmpty) {
-        finalCollection = collection;
-      } else if (collection.isEmpty && subCollection.isNotEmpty) {
-        finalCollection = subCollection;
-      }
-    }
-
-    /* 重量下限 找CN用的 weightUnit = GM */
-    double? physicalWeightLowerBound =
-        catalogItem?.standardSpecificationPhysicalWeight.firstWhereOrNull((e) => e.weightUnit == "GM")?.lowerBound;
-
-    ProductInfo info = ProductInfo(
-        catalogItemCode: catalogItemCode,
-        productName: productName,
-        finalBrandCollection: finalBrandCollection,
-        finalCollection: finalCollection,
-        fixedPriceIndicator: fixedPriceIndicator!,
-        modelSequenceNumber: modelSequenceNumber,
-        inventoryId: inventoryId,
-        itemNumber: itemNumber,
-        usageCode: usageReferenceCode,
-        // netAmount: productAmountPOJO.netAmount,
-        // inventoryAmount: productAmountPOJO.inventoryAmount,
-        // discounts: _discounts,
-        // selectedProductDiscount: ProductDiscount(
-        //   _selectedDiscount?.projectLineId ?? "",
-        //   _selectedDiscount?.discountName ?? "",
-        //   _selectedDiscount?.agreePrice ?? 0,
-        // ),
-        saleType: saleType,
-        // goldPrice: productAmountPOJO.goldPrice,
-        price: price,
-        bookingUnit: ProductBookingUnit(
-            cbu: ProductCbu(inventoryId: inventoryId),
-            modelSequenceNumber: modelSequenceNumber,
-            laborCost: laborCost,
-            grossWeightGram: grossWeight,
-            physicalWeightGram: physicalWeightGram,
-            // caratWeight: caratWeight,
-            // color: color,
-            // clarity: clarity,
-            // cutGrade: cutGrade,
-            size: sizeAndLength,
-            physicalWeightLowerBound: physicalWeightLowerBound,
-            bom: productBomList),
-        pricingType: pricingType,
-        declareMaterial: declareMaterial,
-        usage: usage,
-        goldType: goldType
-        // imagesPath: imagesPath,
-        );
-
-    return info;
-  }
-
-// Future<ProductAmount> getStoreProductAmount(StoreProduct storeProduct) async {
-//   /* 預設定價貨品 */
-//   double inventoryAmount = storeProduct.inventory?.price ?? 0;
-//   double netAmount = 0;
-//   double? goldPrice = 0;
-//   try {
-//     /* 貨牌價 */
-//     /* 計價貨品 */
-//     if (!(storeProduct.model?.fixedPriceIndicator ?? true)) {
-//       Logger.debug(message: 'not fixed price item, then get gold price');
+// ProductInfo _processProductDataFromStore(StoreProduct storeProduct) {
+//   ProductService productService = ProductService();
+//   CatalogItem? catalogItem = storeProduct.catalogItem;
+//   Model? model = storeProduct.model;
+//   Inventory? inventory = storeProduct.inventory;
 //
-//       /* 先取得金價去算貨牌價 */
-//       // TODO action目前寫死為'SELL'
-//       String action = 'SELL';
-//       String pricingType = storeProduct.catalogItem?.pricingType ?? "";
-//       String declareMaterial = storeProduct.catalogItem?.declaredMaterial?.referenceCode ?? '';
-//       String usage = storeProduct.model?.usage?.referenceCode ?? '';
-//       String goldType = storeProduct.catalogItem?.goldType?.referenceCode ?? '';
+//   String pricingType = catalogItem?.pricingType ?? "";
+//   String declareMaterial = catalogItem?.declaredMaterial?.referenceCode ?? '';
+//   String usage = model?.usage?.referenceCode ?? '';
+//   String goldType = catalogItem?.goldType?.referenceCode ?? '';
 //
-//       /* 從api取得金價 */
-//       PossGoldPriceRes? possGoldPriceRes = await productRepository.getGoldPrice(
-//         [action],
-//         [pricingType],
-//         [declareMaterial],
-//         [usage],
-//         [goldType],
-//       );
-//       PossGoldPriceResult? possGoldPriceResult = possGoldPriceRes.results.firstOrNull;
+//   String? inventoryId = inventory!.inventoryId;
+//   bool? fixedPriceIndicator = model?.fixedPriceIndicator;
+//   /* 計價商品工費 取inventory price */
+//   int? laborCost = (fixedPriceIndicator ?? true) ? inventory.laborCost.round() : inventory.price.round();
+//   double? modelSequenceNumber = model?.modelSequenceNumber;
+//   String? itemNumber = inventory.itemNumber;
+//   String? catalogItemCode = catalogItem?.catalogItem;
+//   double? price = inventory.price;
+//   String brand = catalogItem?.brand?.zhCN ?? "";
+//   String collection = catalogItem?.collection?.zhCN ?? "";
+//   String subCollection = catalogItem?.subCollection?.zhCN ?? "";
 //
-//       goldPrice = possGoldPriceResult?.price.toDouble();
-//       double gram = storeProduct.inventory?.grossWeight?.gram ?? 0;
-//       /* 計價商品工費 取inventory price */
-//       double laborCost = storeProduct.inventory?.price ?? 0;
+//   double? grossWeight = inventory.grossWeight?.gram;
+//   List<String> imagesPath = [];
+//   String saleType = SaleType.inStore.value;
+//   double? physicalWeightGram = inventory.physicalWeight?.gram;
+//   // double? caratWeight;
+//   // String? color;
+//   // String? clarity;
+//   // String? cutGrade;
+//   String? usageReferenceCode = catalogItem?.usage?.referenceCode;
+//   String? sizeAndLength = productService.getProductSizeAndLength(
+//       usageReferenceCode ?? "",
+//       model?.length?.referenceCode ?? "",
+//       model?.ringSize?.referenceCode ?? "",
+//       catalogItem?.earringsType.firstOrNull?.zhCN ?? "");
 //
-//       if (goldPrice != null) {
-//         /* 計價商品貨牌價 = 金重(grossWeight) * 金價(goldPrice) + 工費(laborCost) */
-//         inventoryAmount = (gram * goldPrice + laborCost).floorToDouble();
-//       } else {
-//         throw IllegalArgumentException(
-//             "getStoreProductAmount failed _goldPrice[$goldPrice], _grossWeightGram[$gram]");
-//       }
-//       Logger.debug(message: '${storeProduct.inventory?.inventoryId} inventoryAmount $inventoryAmount');
-//     }
+//   //TODO: 先註解從staticReferenceExt取名稱
+//   String? productName = [
+//     catalogItem?.goldType?.zhCN ?? "",
+//     catalogItem?.materialCategory?.zhCN ?? "",
+//     catalogItem?.usage?.zhCN ?? ""
+//   ].where((e) => e.isNotEmpty).join(" ");
+//   // productName = IndexPageState.prodService
+//   //     .getStoreProductName(productInfoRes.catalogItem!)
+//   //     .where((e) => e.isNotEmpty)
+//   //     .join(" ");
 //
-//     /* 約定售價 從api取得 */
-//     String? inventoryId = storeProduct.inventory?.inventoryId;
-//     /* 如果是inventory商品則不帶modelSequenceNumber */
-//     int? modelSequenceNumber = inventoryId != null ? null : storeProduct.model?.modelSequenceNumber.toInt();
-//     Employee employee = await authenticationRepository.getEmployee();;
+//   List<ProductBom> productBomList = inventory.bom
+//       .where((e) => e.mainMaterialIndicator)
+//       .map((e) => ProductBom(
+//           caratWeight: e.caratWeight,
+//           color: e.diamondColor?.zhCN,
+//           clarity: e.diamondClarity?.referenceCode,
+//           cutGrade: e.diamondCutGrade?.zhCN,
+//           bomCertificates: e.bomCertificates
+//               .map((s) => ProductBomCertificate(
+//                   physicalCertificateIndicator: s.physicalCertificateIndicator ?? "",
+//                   certificateOrganization: s.certificateOrganization ?? "",
+//                   certificateNumber: s.certificateNumber ?? "",
+//                   reportPdfPath: s.reportPdfPath,
+//                   digitalCardPath: s.digitalCardPath))
+//               .toList()))
+//       .toList();
+//   // caratWeight = bom?.caratWeight;
+//   // color = bom?.diamondColor?.zhCN;
+//   // clarity = bom?.diamondClarity?.referenceCode;
+//   // cutGrade = bom?.diamondCutGrade?.zhCN;
 //
-//     customerSessionRepository.currentCustomerSession(employee);
+//   String? finalBrandCollection;
+//   String? finalCollection;
 //
-//     final String? customerId = customerSessionRepository.currentCustomerSession(employee)?.customerId;
-//     PossProductDiscountCalculateRes? possInventorySingleDiscounts = await productRepository
-//         .postProductDiscountCalculate(customerId: customerId, products: [
-//       PossProductDiscountCalculateReqProduct(inventoryId: inventoryId, modelSequenceNumber: modelSequenceNumber)
-//     ]);
-//
-//     PossSingleDiscountResult? singleDiscountResult = possInventorySingleDiscounts.singleDiscountResults.firstOrNull;
-//     List<PossSingleDiscount> discounts =
-//         singleDiscountResult?.discounts.where((e) => e.projectLineId != null).toList() ?? [];
-//     PossSingleDiscount? selectedDiscount = discounts.firstOrNull;
-//     if (discounts.isNotEmpty) {
-//       Logger.debug(
-//           message:
-//               'got discounts from getSingleDiscounts response, length:${singleDiscountResult?.discounts.length}');
-//       netAmount = discounts.map((e) => e.agreePrice).reduce(min).toDouble();
-//       Logger.debug(message: 'found minimum price from discounts $netAmount');
-//       selectedDiscount = discounts.firstWhere((e) => e.agreePrice == netAmount);
-//       Logger.debug(message: 'found discount code of minimum price ${selectedDiscount.projectLineId}');
-//     } else {
-//       Logger.debug(message: 'got empty discounts from getSingleDiscounts response');
-//       netAmount = inventoryAmount.floorToDouble();
-//     }
-//
-//     return ProductAmount(inventoryAmount, netAmount, selectedDiscount, discounts, goldPrice);
-//   } catch (e) {
-//     Logger.error(message: "get product item net amount failed");
-//     rethrow;
+//   if (brand.isNotEmpty) {
+//     finalBrandCollection = brand;
+//   } else if (brand.isEmpty && collection.isNotEmpty) {
+//     finalBrandCollection = collection;
 //   }
+//
+//   if (finalBrandCollection == collection) {
+//     finalCollection = subCollection;
+//   } else {
+//     if (collection.isNotEmpty) {
+//       finalCollection = collection;
+//     } else if (collection.isEmpty && subCollection.isNotEmpty) {
+//       finalCollection = subCollection;
+//     }
+//   }
+//
+//   /* 重量下限 找CN用的 weightUnit = GM */
+//   double? physicalWeightLowerBound =
+//       catalogItem?.standardSpecificationPhysicalWeight.firstWhereOrNull((e) => e.weightUnit == "GM")?.lowerBound;
+//
+//   ProductInfo info = ProductInfo(
+//       catalogItemCode: catalogItemCode,
+//       productName: productName,
+//       finalBrandCollection: finalBrandCollection,
+//       finalCollection: finalCollection,
+//       fixedPriceIndicator: fixedPriceIndicator!,
+//       modelSequenceNumber: modelSequenceNumber,
+//       inventoryId: inventoryId,
+//       itemNumber: itemNumber,
+//       usageCode: usageReferenceCode,
+//       // netAmount: productAmountPOJO.netAmount,
+//       // inventoryAmount: productAmountPOJO.inventoryAmount,
+//       // discounts: _discounts,
+//       // selectedProductDiscount: ProductDiscount(
+//       //   _selectedDiscount?.projectLineId ?? "",
+//       //   _selectedDiscount?.discountName ?? "",
+//       //   _selectedDiscount?.agreePrice ?? 0,
+//       // ),
+//       saleType: saleType,
+//       // goldPrice: productAmountPOJO.goldPrice,
+//       price: price,
+//       bookingUnit: ProductBookingUnit(
+//           cbu: ProductCbu(inventoryId: inventoryId),
+//           modelSequenceNumber: modelSequenceNumber,
+//           laborCost: laborCost,
+//           grossWeightGram: grossWeight,
+//           physicalWeightGram: physicalWeightGram,
+//           // caratWeight: caratWeight,
+//           // color: color,
+//           // clarity: clarity,
+//           // cutGrade: cutGrade,
+//           size: sizeAndLength,
+//           physicalWeightLowerBound: physicalWeightLowerBound,
+//           bom: productBomList),
+//       pricingType: pricingType,
+//       declareMaterial: declareMaterial,
+//       usage: usage,
+//       goldType: goldType
+//       // imagesPath: imagesPath,
+//       );
+//
+//   return info;
 // }
 }
