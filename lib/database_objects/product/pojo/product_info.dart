@@ -88,7 +88,7 @@ class ProductBookingUnit {
   double? grossWeightGram;
   double? bookWeightGram;
   double? physicalWeightGram;
-  double? laborCost;
+  int? laborCost;
   String? inventoryState;
   String? productLifeCycleCode;
   String? size;
@@ -97,6 +97,7 @@ class ProductBookingUnit {
   String? pendingIndicator;
   String? inventoryStatus;
   double? standardSpecificationPhysicalWeightLowerBound;
+  double? physicalWeightLowerBound;
   List<ProductBom> bom;
 
   ProductBookingUnit(
@@ -135,6 +136,7 @@ class ProductBookingUnit {
       this.pendingIndicator,
       this.inventoryStatus,
       this.standardSpecificationPhysicalWeightLowerBound,
+      this.physicalWeightLowerBound,
       this.bom = const []});
 }
 
@@ -143,9 +145,9 @@ class ProductBom {
   String? color;
   String? clarity;
   String? cutGrade;
-  List<ProductBomCertificate>? bomCertificates;
+  List<ProductBomCertificate> bomCertificates;
 
-  ProductBom({this.caratWeight, this.color, this.clarity, this.cutGrade, this.bomCertificates});
+  ProductBom({this.caratWeight, this.color, this.clarity, this.cutGrade, this.bomCertificates = const []});
 }
 
 class ProductCbu {

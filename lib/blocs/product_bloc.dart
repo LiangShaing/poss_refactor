@@ -101,7 +101,7 @@ class ProductBloc extends AbstractBloc<ProductEvent, ProductState> {
     Inventory? inventory = storeProduct.inventory;
 
     String? inventoryId;
-    double? laborCost;
+    int? laborCost;
     double? modelSequenceNumber;
     String? itemNumber;
     String? catalogItemCode;
@@ -125,7 +125,7 @@ class ProductBloc extends AbstractBloc<ProductEvent, ProductState> {
     inventoryId = inventory!.inventoryId;
     fixedPriceIndicator = model?.fixedPriceIndicator;
     /* 計價商品工費 取inventory price */
-    laborCost = (fixedPriceIndicator ?? true) ? inventory.laborCost : inventory.price;
+    laborCost = (fixedPriceIndicator ?? true) ? inventory.laborCost.round() : inventory.price.round();
     modelSequenceNumber = model?.modelSequenceNumber;
     itemNumber = inventory.itemNumber;
     catalogItemCode = catalogItem?.catalogItem;
@@ -190,6 +190,10 @@ class ProductBloc extends AbstractBloc<ProductEvent, ProductState> {
       }
     }
 
+    /* 重量下限 找CN用的 weightUnit = GM */
+    double? physicalWeightLowerBound =
+        catalogItem?.standardSpecificationPhysicalWeight.firstWhereOrNull((e) => e.weightUnit == "GM")?.lowerBound;
+
     ProductInfo info = ProductInfo(
       catalogItemCode: catalogItemCode,
       productName: productName,
@@ -225,6 +229,7 @@ class ProductBloc extends AbstractBloc<ProductEvent, ProductState> {
           clarity: clarity,
           cutGrade: cutGrade,
           size: sizeAndLength,
+          physicalWeightLowerBound: physicalWeightLowerBound,
           bom: productBomList),
       // imagesPath: imagesPath,
     );

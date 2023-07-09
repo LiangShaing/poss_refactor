@@ -115,6 +115,17 @@ class _AddToCartByStoreStatefulWidgetState extends State<AddToCartByStoreStatefu
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> certificateList = [];
+    for (ProductBom bom in widget.productInfo.bookingUnit?.bom ?? []) {
+      certificateList.addAll(bom.bomCertificates.map((e) {
+        String physicalCert =
+            "(${e.certificateOrganization}${e.physicalCertificateIndicator == "Y" ? ' ${"product.label.physicalCert".tr}' : ''})";
+        String number = "${e.certificateNumber}$physicalCert";
+        String? path = e.certificateOrganization == 'GIA' ? e.reportPdfPath : e.digitalCardPath;
+        return certificateWidget(number, path);
+      }).toList());
+    }
+
     return MyAlertDialogStatelessWidget(
       title: "widget.addToCart.title".tr,
       body: Row(
@@ -170,63 +181,72 @@ class _AddToCartByStoreStatefulWidgetState extends State<AddToCartByStoreStatefu
                             if (e.cutGrade != null)
                               MyTextStatelessWidget(
                                   text: "${"product.widgets.factory.cutGrade".tr}${e.cutGrade}",
-                                  style: _textTheme.titleLarge,
-                                  padding: const EdgeInsets.symmetric(horizontal: SizeStyle.paddingUnit * 0.2)),
+                                  style: _textTheme.titleLarge),
                           ],
                         ),
                       )
                     ]
                   ],
 
-                  // /* 計價 */
-                  // if (widget.storeProductInfo.model != null &&
-                  //     !widget.storeProductInfo.model!.fixedPriceIndicator) ...[
-                  //   Wrap(
-                  //     direction: Axis.horizontal,
-                  //     crossAxisAlignment: WrapCrossAlignment.end,
-                  //     children: [
-                  //       MyTextStatelessWidget(text: "${"cart.label.brandPrice".tr}:",
-                  //           padding: const EdgeInsets.only(right: SizeStyle.paddingUnit),
-                  //           style: _textTheme.titleLarge),
-                  //       /* 金重 */
-                  //       if ((widget.storeProductInfo.inventory?.physicalWeight?.gram.toString() ?? "").isNotEmpty)
-                  //         _factory.getPhysicalWeight().render(context,
-                  //             "${widget.storeProductInfo.inventory?.physicalWeight?.gram.toString()}${"cart.label.gram".tr}",
-                  //             label: "product.widgets.factory.goldWeight".tr),
-                  //       /* 賣出金價 */
-                  //       if ((_productAmountPOJO?.goldPrice.toString() ?? "").isNotEmpty)
-                  //         _factory.getGoldPrice().render(context, "¥${_productAmountPOJO?.goldPrice.toString()}",
-                  //             label: "product.widgets.factory.saleGoldWeight".tr),
-                  //       /* 工費 取inventory price */
-                  //       _factory.getLaborCost().render(
-                  //           context, widget.storeProductInfo.inventory?.price.round().toString(),
-                  //           label: "${"product.widgets.factory.laborCost".tr}RMB¥"),
-                  //     ],
-                  //   ),
-                  // ],
-                  // /* 圈號/長度 */
-                  // if (sizeLength.isNotEmpty) _factory.getUsage().render(context, sizeLength),
-                  // // /* 證書 */
-                  // // if (certificates.isNotEmpty) _factory.getCertificates().render(context, certificates),
-                  // if (certificateList.isNotEmpty)
-                  //   Wrap(
-                  //     children: [
-                  //       MyTextStatelessWidget(text:"${"product.label.certificateNo".tr}:",
-                  //           style: _textTheme.titleLarge),
-                  //       Wrap(children: [...certificateList]),
-                  //     ],
-                  //   ),
-                  //
-                  // /* 貨重 */
-                  // _factory.getGrossWeight().render(context,
-                  //     "${widget.storeProductInfo.inventory?.grossWeight?.gram.toString()}${"cart.label.gram".tr}",
-                  //     label: "product.widgets.factory.physicalWeight".tr),
-                  //
-                  // /* 重量下限 */
-                  // if (physicalWeightLowerBound != null)
-                  //   _factory.getGrossWeight().render(
-                  //       context, "${physicalWeightLowerBound.toString()}${"cart.label.gram".tr}",
-                  //       label: "product.widgets.factory.standardSpecificationPhysicalWeight".tr),
+                  /* 計價 */
+                  if (!widget.productInfo.fixedPriceIndicator) ...[
+                    Wrap(
+                      direction: Axis.horizontal,
+                      crossAxisAlignment: WrapCrossAlignment.end,
+                      children: [
+                        MyTextStatelessWidget(
+                            text: "${"cart.label.brandPrice".tr}:",
+                            padding: const EdgeInsets.only(right: SizeStyle.paddingUnit),
+                            style: _textTheme.titleLarge),
+                        /* 金重 */
+                        if ((widget.productInfo.bookingUnit?.physicalWeightGram?.toString() ?? "").isNotEmpty)
+                          MyTextStatelessWidget(
+                              text:
+                                  "${"product.widgets.factory.goldWeight".tr}${widget.productInfo.bookingUnit?.physicalWeightGram}${"cart.label.gram".tr}",
+                              style: _textTheme.titleLarge,
+                              padding: const EdgeInsets.symmetric(horizontal: SizeStyle.paddingUnit * 0.2)),
+
+                        /* 賣出金價 */
+                        // if ((_productAmountPOJO?.goldPrice.toString() ?? "").isNotEmpty)
+                        //   _factory.getGoldPrice().render(context, "¥${_productAmountPOJO?.goldPrice.toString()}",
+                        //       label: "product.widgets.factory.saleGoldWeight".tr),
+                        /* 工費 取inventory price */
+                        if ((widget.productInfo.bookingUnit?.laborCost?.toString() ?? "").isNotEmpty)
+                          MyTextStatelessWidget(
+                              text:
+                                  "${"product.widgets.factory.laborCost".tr}RMB¥${widget.productInfo.bookingUnit?.laborCost}",
+                              style: _textTheme.titleLarge,
+                              padding: const EdgeInsets.symmetric(horizontal: SizeStyle.paddingUnit * 0.2))
+                      ],
+                    ),
+                  ],
+                  /* 圈號/長度 */
+                  if (widget.productInfo.bookingUnit != null && (widget.productInfo.bookingUnit!.size ?? "").isNotEmpty)
+                    MyTextStatelessWidget(text: widget.productInfo.bookingUnit!.size, style: _textTheme.titleLarge),
+
+                  /* 證書 */
+                  if (certificateList.isNotEmpty)
+                    Wrap(
+                      children: [
+                        MyTextStatelessWidget(
+                            text: "${"product.label.certificateNo".tr}:", style: _textTheme.titleLarge),
+                        Wrap(children: [...certificateList]),
+                      ],
+                    ),
+
+                  /* 貨重 */
+                  if (widget.productInfo.bookingUnit?.grossWeightGram != null)
+                    MyTextStatelessWidget(
+                        text:
+                            "${"product.widgets.factory.grossWeightGram".tr}${widget.productInfo.bookingUnit?.grossWeightGram}${"cart.label.gram".tr}",
+                        style: _textTheme.titleLarge),
+
+                  /* 重量下限 */
+                  if (widget.productInfo.bookingUnit?.physicalWeightLowerBound != null)
+                    MyTextStatelessWidget(
+                        text:
+                            "${"product.widgets.factory.standardSpecificationPhysicalWeight".tr}${widget.productInfo.bookingUnit?.physicalWeightLowerBound}${"cart.label.gram".tr}",
+                        style: _textTheme.titleLarge),
                 ],
               ),
             ),

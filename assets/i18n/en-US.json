@@ -257,6 +257,7 @@
   "product.widgets.factory.color": "Color",
   "product.widgets.factory.cutGrade": "Cut Grade",
   "product.widgets.factory.goldWeight": "Gold weight",
+  "product.widgets.factory.grossWeightGram": "Gross Weight",
   "product.widgets.factory.laborCost": "Labor cost",
   "product.widgets.factory.length": "Length",
   "product.widgets.factory.pair": "Pair",
