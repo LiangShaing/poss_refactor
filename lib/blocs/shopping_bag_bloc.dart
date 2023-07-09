@@ -31,7 +31,23 @@ class ShoppingBagBloc extends AbstractBloc<ShoppingBagEvent, ShoppingBagState> {
       // required this.productRepository,
       required this.customerSessionRepository})
       : super(ShoppingBagLoadInitial()) {
+    on<ShoppingBagStarted>(_cartInitial);
     on<ShoppingBagItemAdded>(_addToCartItem);
+  }
+
+  Future<void> _cartInitial(ShoppingBagStarted event, Emitter<ShoppingBagState> emit) async {
+    emit(ShoppingBagLoadInProgress());
+
+    Employee employee = await authenticationRepository.getEmployee();
+
+    CustomerSession? currentCustomerSession = customerSessionRepository.currentCustomerSession(employee);
+    if (currentCustomerSession == null) {
+      emit(const ShoppingBagLoadFailure("請先產生會客序號"));
+      return;
+    }
+
+    ShoppingBag? shoppingBag = currentCustomerSession.shoppingBag;
+    emit(ShoppingBagLoadSuccess(shoppingBag: shoppingBag));
   }
 
   Future<void> _addToCartItem(ShoppingBagItemAdded event, Emitter<ShoppingBagState> emit) async {

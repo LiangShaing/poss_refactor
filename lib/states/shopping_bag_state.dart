@@ -16,17 +16,22 @@ class ShoppingBagLoadInProgress extends ShoppingBagState {
 }
 
 class ShoppingBagLoadSuccess extends ShoppingBagState {
-  const ShoppingBagLoadSuccess({required this.shoppingBag});
+  const ShoppingBagLoadSuccess({this.shoppingBag});
 
-  final ShoppingBag shoppingBag;
+  final ShoppingBag? shoppingBag;
 
   @override
-  List<Object> get props => [shoppingBag];
+  List<Object?> get props => [shoppingBag];
 }
 
 class ShoppingBagLoadFailure extends ShoppingBagState {
+  const ShoppingBagLoadFailure(this.errorMessage, {this.exception});
+
+  final String errorMessage;
+  final dynamic exception;
+
   @override
-  List<Object> get props => [];
+  List<Object> get props => [errorMessage, exception];
 }
 
 class ShoppingBagItemAddInProgress extends ShoppingBagState {

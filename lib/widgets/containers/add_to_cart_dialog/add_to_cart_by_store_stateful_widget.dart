@@ -11,7 +11,9 @@ import 'package:mobile_poss_gp01/blocs/shopping_bag_bloc.dart';
 import 'package:mobile_poss_gp01/database_objects/product/pojo/product_amount.dart';
 import 'package:mobile_poss_gp01/database_objects/product/pojo/product_info.dart';
 import 'package:mobile_poss_gp01/database_objects/product/pojo/store_product.dart';
+import 'package:mobile_poss_gp01/database_objects/realm/model/customer_session.dart';
 import 'package:mobile_poss_gp01/database_objects/realm/model/inventory.dart';
+import 'package:mobile_poss_gp01/enum/ct_line_status.dart';
 import 'package:mobile_poss_gp01/events/product_amount_event.dart';
 import 'package:mobile_poss_gp01/events/product_info_event.dart';
 import 'package:mobile_poss_gp01/events/shopping_bag_event.dart';
@@ -485,7 +487,8 @@ class _AddToCartByStoreStatefulWidgetState extends State<AddToCartByStoreStatefu
                               BlocProvider<ShoppingBagBloc>(
                                   create: (BuildContext context) => ShoppingBagBloc(
                                       authenticationRepository: AuthenticationRepository(),
-                                      customerSessionRepository: CustomerSessionRepository()),
+                                      customerSessionRepository: CustomerSessionRepository())
+                                    ..add(ShoppingBagStarted()),
                                   child: BlocListener<ShoppingBagBloc, ShoppingBagState>(listener:
                                       (context, shoppingBagState) {
                                     if (shoppingBagState is ShoppingBagItemAddFailure) {
@@ -505,14 +508,28 @@ class _AddToCartByStoreStatefulWidgetState extends State<AddToCartByStoreStatefu
                                     }
                                   }, child:
                                       BlocBuilder<ShoppingBagBloc, ShoppingBagState>(builder: (context, shoppingState) {
+                                    bool isInBag = false;
+                                    if (shoppingState is ShoppingBagLoadSuccess) {
+                                      ShoppingBag? shoppingBag = shoppingState.shoppingBag;
+                                      isInBag = shoppingBag?.items.firstWhereOrNull((e) =>
+                                              e.modelSequenceNumber == state.productInfo.modelSequenceNumber &&
+                                              e.inventoryId == state.productInfo.inventoryId &&
+                                              e.status != CTLineStatus.voided.value) !=
+                                          null;
+                                    }
                                     return ElevatedButton(
-                                      onPressed: () {
-                                        context.read<ShoppingBagBloc>().add(ShoppingBagItemAdded(
-                                            productInfo: state.productInfo,
-                                            productAmount: productAmountState.productAmount!));
-                                      },
+                                      onPressed: shoppingState is ShoppingBagLoadSuccess && !isInBag
+                                          ? () {
+                                              context.read<ShoppingBagBloc>().add(ShoppingBagItemAdded(
+                                                  productInfo: state.productInfo,
+                                                  productAmount: productAmountState.productAmount!));
+                                            }
+                                          : null,
                                       style: ElevatedButton.styleFrom(minimumSize: SizeStyle.dialogButtonSize),
-                                      child: Text("widget.addToCart.button.addToCart".tr,
+                                      child: Text(
+                                          isInBag
+                                              ? "widget.addToCart.button.alreadyAddToCart".tr
+                                              : "widget.addToCart.button.addToCart".tr,
                                           style: _textTheme.titleLarge?.copyWith(color: ColorStyle.white)),
                                     );
                                   }))),
