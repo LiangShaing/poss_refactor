@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:mobile_poss_gp01/database_objects/user/pojo/employee_pojo.dart';
 
 class ProductDataProvider extends RealmDataProvider {
-  PossMobileService possMobileService = ServiceFactory.createPossMobileService();
+  PossMobileService possMobileService = ServiceFactory.createPossMobileService(rtGetNewAtToggle: true);
 
   Earmark? findEarmarkByCatalogItem(String value) {
     return realmSyncDao.realm.query<Earmark>(r'catalogItem ==[c] $0', [value]).firstOrNull;
